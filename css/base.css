@@ -1,0 +1,273 @@
+/* Options Framework Admin Styles */
+
+#optionsframework {
+    max-width:1040px;
+    background:#fff;
+}
+#optionsframework h3 {
+	cursor: default;
+	background-color: #f1f1f1;
+	border-bottom: 1px solid #ddd;
+}
+#optionsframework p {
+	margin-bottom:0;
+	padding-bottom:10px;
+}
+#optionsframework .section {
+	padding:10px 10px 0;
+}
+#optionsframework .group {
+	padding-bottom: 40px;	
+}
+
+#optionsframework .group .section-wrapper{
+	padding: 0 12px;
+}
+
+#optionsframework .section .controls {
+	float: left;
+	min-width:350px;
+	width: 54%;
+	padding-right:2%;
+}
+#optionsframework .section .explain {
+	max-width:38%;
+	float: left;
+	font-size: 12px;
+	line-height:16px;
+	color: #777;
+}
+#optionsframework .section-checkbox .controls {
+	width: 98%;
+}
+#optionsframework .section-checkbox .explain {
+	max-width:94%;
+}
+#optionsframework .controls input[type=text] {
+	width:100%;
+}
+#optionsframework .controls input[type=text].wp-color-picker {
+    width: 65px;
+}
+#optionsframework .controls select, #optionsframework .controls textarea {
+	margin-bottom:10px;
+	width:100%;
+}
+#optionsframework .section-radio label, #optionsframework .section-multicheck label {
+	float:left;
+	max-width:90%;
+	line-height: 16px;
+	margin-bottom: 5px;
+}
+
+#optionsframework .section-typography .controls {
+	float:none;
+	width:auto;
+}
+#optionsframework .section-typography .explain {
+	float:none;
+	width:auto;
+}
+#optionsframework .controls .of-typography-size {
+	width:80px;
+	float:left
+}
+#optionsframework .controls .of-typography-unit {
+	width:50px;
+	margin-left:5px;
+	float:left
+}
+#optionsframework .controls .of-typography-face {
+	width:100px;
+	margin-left:5px;
+	float:left
+}
+#optionsframework .controls .of-typography-style {
+	width:80px;
+	margin-left:5px;
+	margin-right:5px;
+	float:left
+}
+#optionsframework .section-typography .wp-picker-container {
+	margin-top:2px;
+}
+#optionsframework .of-background-properties {
+	clear:both;
+	margin-top: 18px;
+}
+#optionsframework .controls .of-background-repeat {
+	width:125px;
+	margin-right:5px;
+	float:left
+}
+#optionsframework .controls .of-background-position {
+	width:125px;
+	margin-right:5px;
+	float:left
+}
+#optionsframework .controls .of-background-attachment {
+	width:125px;
+	margin-right:5px;
+	float:left
+}
+#optionsframework .section-background .wp-picker-container {
+	margin-bottom:10px;
+}
+#optionsframework .controls .of-radio-img-img {
+	border:3px solid #f9f9f9;
+	margin:0 5px 10px 0;
+	display:none;
+	cursor:pointer;
+	float:left;
+}
+#optionsframework .controls .of-radio-img-selected {
+	border:3px solid #ccc
+}
+#optionsframework .controls .of-radio-img-img:hover {
+	opacity:.8;
+}
+#optionsframework .controls .of-border-width {
+	width:80px;
+	float:left
+}
+#optionsframework .controls .of-border-style {
+	width:120px;
+	float:left
+}
+#optionsframework .hide {
+	display:none;
+}
+#optionsframework .of-option-image {
+	max-width:340px;
+	margin:3px 0 18px 0;
+}
+#optionsframework .mini .controls select, #optionsframework .section .mini .controls {
+	width: 140px;
+}
+#optionsframework .mini .controls input, #optionsframework .mini .controls {
+	min-width:140px;
+	width: 140px;
+}
+#optionsframework .mini .explain {
+	max-width:74%;
+}
+
+/* Editor */
+
+#optionsframework .section-editor .explain {
+	max-width: 98%;
+	float:none;
+	margin-bottom:5px;
+}
+
+/* Image Uploader */
+
+
+
+/* Bottom Section */
+
+#optionsframework-submit {
+	padding: 7px 10px;
+	border-top: 1px solid #ddd;
+	background-color: #f1f1f1;
+}
+#optionsframework .button-primary {
+	float:right;
+}
+#optionsframework .section:after {
+	content: "";
+	display: table;
+}
+#optionsframework .section:after {
+	clear: both;
+}
+
+label.description{
+	color: #777;
+	margin: 0 0 0 15px;
+}
+
+label.description-block{
+	color: #777;
+	margin: 15px 0 0;	
+	display: block;
+}
+
+.control-checkbox-wrap,
+.control-radio-wrap {
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	margin: 5px 0;
+	padding: 3px 0;
+}
+
+.control-checkbox-wrap input[type="checkbox"]{
+	margin: 0 5px 0 0;
+}
+
+.control-checkbox-wrap label{
+	display: inline;
+}
+
+input.control-radio{
+	display: inline-block;	
+	margin: 3px 3px 0 0;
+}
+
+.controls input.upload {
+	width:80%;
+}
+.screenshot {
+	float:left;
+	margin-left:1px;
+	position: relative;
+	width:344px;
+	margin-top:3px;
+}
+.screenshot img {
+	background:#fafafa;
+	border-color:#ccc #eee #eee #ccc;
+	border-style:solid;
+	border-width:1px;
+	float:left;
+	max-width: 339px;
+	padding: 4px;
+	margin-bottom:10px;
+}
+
+.screenshot .remove-image{
+	position: absolute;
+	top: 10px;
+	right: 5px;
+	cursor: pointer;
+}
+
+.screenshot .remove-image:hover i{
+	text-shadow: 0 0 10px white;
+}
+
+.screenshot .remove-image i{
+	color: white;
+}
+
+.screenshot .no_image .file_link {
+	margin-left: 20px;
+}
+.screenshot .no_image .remove-button {
+	bottom: 0px;
+}
+
+.control-media-screenshot{ 
+	width: 100%;
+	overflow: hidden;
+}
+
+.control-media input[type="text"]{
+	margin: 3px 10px 0 0;
+}
+
+.form-field input[type="checkbox"]{
+	float: left;
+	width: auto;
+}
