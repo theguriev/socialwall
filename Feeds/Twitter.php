@@ -21,18 +21,23 @@ class Twitter extends Feed{
 
 	public function getMessages($count = 5, $offset = 0)
 	{
+		$cache_key = $this->formatCacheKey(
+			array($this->getName(), $count, $offset)
+		);
+
 		$user  = $this->options['account'];		
-		$cache = $this->getCache($user.$count);
+		$cache = $this->getCache($cache_key);
 		if($cache)
 		{			
 			return $cache;
 		}
-		$query = sprintf('https://api.twitter.com/1.1/statuses/user_timeline.json?count=%s&screen_name=%s', $count, urlencode($user));
+		$query  = sprintf('https://api.twitter.com/1.1/statuses/user_timeline.json?count=%s&screen_name=%s', $count, urlencode($user));
 		$tweets = $this->obj->get($query);		
+		$tweets = $this->convert($tweets);
 
-		$this->setCache($user.$count, $tweets, 3600);
+		$this->setCache($cache_key, $tweets, 3600);
 		
-		return $this->convert($tweets);
+		return $tweets;
 	}
 
 	/**
@@ -59,7 +64,8 @@ class Twitter extends Feed{
 						$tweet->created_at,
 						$tweet->user->name,
 						$picture,
-						$this->getName()
+						$this->getName(),
+						$this->getIcon()
 					));
 			}	
 		}
@@ -81,6 +87,15 @@ class Twitter extends Feed{
 		}
 		if(count($URLs) > 0) return implode(',', $URLs);
 		return '';
+	}
+
+	/**
+	 * Get feed message/button icon
+	 * @return string
+	 */
+	public function getIcon()
+	{
+		return 'fa-twitter';
 	}
 	                                             
 }

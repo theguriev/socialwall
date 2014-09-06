@@ -29,10 +29,18 @@ class Facebook extends Feed{
 
 	public function getMessages($count = 5, $offset = 0)
 	{
-		$ids     = $this->getIDs($count);
-		$objects = array();
-		$user    = $this->options['account'];		
-
+		$cache_key = $this->formatCacheKey(
+			array($this->getName(), $count, $offset)
+		);
+		$ids       = $this->getIDs($count);
+		$objects   = array();
+		$user      = $this->options['account'];
+		$cache     = $this->getCache($cache_key);	
+		if($cache)
+		{			
+			return $cache;
+		}	
+	
 		if(!is_array($ids)) return false;
 		foreach ($ids as $id) 
 		{
@@ -44,8 +52,10 @@ class Facebook extends Feed{
 			$response  = $request->execute();
 			$objects[] = $response->getGraphObject()->asArray();			
 		}
-		
-		return $this->convert($objects);
+		$feed = $this->convert($objects);
+
+		$this->setCache($cache_key, $feed);
+		return $feed;
 	}
 
 	private function getIDs($count)
@@ -93,7 +103,8 @@ class Facebook extends Feed{
 					$el['created_time'],
 					$el['from']->name,
 					$this->getImage($el),
-					$this->getName()
+					$this->getName(),
+					$this->getIcon()
 				));
 		}			
 		return $messages;
@@ -127,5 +138,14 @@ class Facebook extends Feed{
 		if(isset($obj['name'])) return $obj['name'];
 		if(isset($obj['message'])) return $obj['message'];
 		return '';
-	}                             
+	}         
+
+	/**
+	 * Get feed message/button icon
+	 * @return string
+	 */
+	public function getIcon()
+	{
+		return 'fa-facebook';
+	}                    
 }

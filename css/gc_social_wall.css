@@ -1,0 +1,163 @@
+.bricks nav ul.bricks-buttons{
+	margin: 0;
+	text-align: center;
+}
+
+.bricks nav{
+	margin: 0 0 30px 0;
+}
+
+.bricks nav ul.bricks-buttons li{
+	display: inline-block;
+	margin: 0 0 0 5px;
+}
+
+.bricks nav ul.bricks-buttons li a{
+	color: white;
+	background: black;
+	display: block;
+	width: 60px;
+	height: 60px;
+	box-sizing: border-box;
+	border: 2px solid transparent;
+}
+
+.bricks nav ul.bricks-buttons li a i{
+	line-height: 60px;
+}
+
+.bricks .bricks-content .brick{
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+	display: block;
+	float: left;
+	width: 300px;
+	margin: 0 0 10px 0;
+}
+
+.bricks .bricks-content .brick .brick-type{
+	position: absolute;
+	top: 30px;
+	left: 0;
+	display: block;
+	width: 30px;
+	height: 30px;	
+	text-align: center;
+	-webkit-transition: all 0.3s ease-out 0.1s;
+	        transition: all 0.3s ease-out 0.1s;
+}
+
+.bricks .bricks-content .brick .brick-type:hover{
+	opacity: 0;
+}
+
+.bricks .bricks-content .brick .brick-type i{
+	line-height: 30px;
+	color: white;
+}
+
+.bricks .bricks-content .brick header{
+	float: left;
+}
+
+.bricks .bricks-content .brick header img{
+	width: 100%;
+	border-radius: 0;
+}
+
+.bricks .bricks-content .brick section{
+	padding: 20px;
+}
+
+.brick footer{
+	text-align: center;
+	padding: 15px;
+	color: white;
+}
+
+.brick footer a{
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+/*COLORS*/
+.bricks .bricks-content .brick.twitter footer,
+.bricks .bricks-content .brick.twitter .brick-type{
+	background: #55acee;
+}
+
+.bricks nav ul.bricks-buttons li.twitter.filter a:hover,
+.bricks nav ul.bricks-buttons li.twitter a{
+	background: #55acee;
+	color: white;
+	border-color: transparent;
+}	
+
+.bricks nav ul.bricks-buttons li.twitter a:hover,
+.bricks nav ul.bricks-buttons li.twitter.filter a{	
+	background: transparent;
+	color: #55acee;
+	border-color: #55acee;
+}
+
+.bricks .bricks-content .brick.facebook footer,
+.bricks .bricks-content .brick.facebook .brick-type{
+	background: #3b5998;
+}
+
+.bricks nav ul.bricks-buttons li.facebook.filter a:hover,
+.bricks nav ul.bricks-buttons li.facebook a{
+	background: #3b5998;
+	color: white;
+	border-color: transparent;
+}
+
+.bricks nav ul.bricks-buttons li.facebook.filter a,
+.bricks nav ul.bricks-buttons li.facebook a:hover{
+	color: #3b5998;
+	border-color: #3b5998;
+	background: transparent;
+}
+
+.bricks .bricks-content .brick.post footer,
+.bricks .bricks-content .brick.post .brick-type{
+	background: #222222;
+}
+
+.bricks nav ul.bricks-buttons li.post.filter a:hover,
+.bricks nav ul.bricks-buttons li.post a{
+	background: #222222;
+	color: white;
+	border-color: transparent;
+}
+
+.bricks nav ul.bricks-buttons li.post.filter a,
+.bricks nav ul.bricks-buttons li.post a:hover{
+	color: #222222;
+	border-color: #222222;
+	background: transparent;	
+}
+
+.bricks .bricks-content .brick.youtube footer,
+.bricks .bricks-content .brick.youtube .brick-type{
+	background: #b31217;
+}
+
+.bricks nav ul.bricks-buttons li.youtube.filter a:hover,
+.bricks nav ul.bricks-buttons li.youtube a{
+	background: #b31217;
+	color: white;
+	border-color: transparent;
+}
+
+.bricks nav ul.bricks-buttons li.youtube.filter a,
+.bricks nav ul.bricks-buttons li.youtube a:hover{
+	color: #b31217;
+	border-color: #b31217;
+	background: transparent;	
+}
+
+
+
+

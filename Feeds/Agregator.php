@@ -39,17 +39,36 @@ class Agregator{
 	}
 
 	/**
-	 * Get all feeds
+	 * Get all registered feeds
+	 * @return array --- feeds collection
+	 */
+	public function getFeeds()
+	{
+		return (array) $this->feeds;
+	}
+
+	/**
+	 * Get all posts
 	 * @param  integer $count  --- msg per feed
 	 * @param  integer $offset --- offset msg
 	 * @return array           --- all feeds with msg
 	 */
-	public function getFeeds($count = 5, $offset = 0)
+	public function getMessages($count = 5, $offset = 0)
 	{		
 		foreach ($this->feeds as $key => $feed) 
 		{
-			$mssages[$key] = $feed->getMessages($count, $offset);
+			$messages = (array) $feed->getMessages($count, $offset);
+			if(count($messages))
+			{
+				foreach ($messages as &$msg) 
+				{
+					$time           = strtotime($msg->date);
+					$posts[$time][] = $msg;
+				}
+			}
 		}
-		return (array) $mssages;
+		krsort($posts);
+		
+		return $posts;
 	}
 }

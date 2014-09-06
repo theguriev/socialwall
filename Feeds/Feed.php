@@ -3,7 +3,7 @@
 namespace Feeds;
 
 abstract class Feed{
-	const CACHE_ON = FALSE;
+	const CACHE_ON = TRUE;
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -24,15 +24,25 @@ abstract class Feed{
 	}
 
 	/**
+	 * Format text in the MD5 key cache
+	 * @param  array  $properties --- key pieces
+	 * @return string
+	 */
+	public function formatCacheKey($properties = array())
+	{
+		return md5(implode('_', $properties));
+	}
+
+	/**
 	 * Set Cache
 	 * @param string  $key    
 	 * @param string  $val    
 	 * @param integer $time   
 	 * @param string  $prefix 
 	 */
-	public function setCache($key, $val, $time = 3600, $prefix = 'cheched-')
+	public function setCache($key, $val, $time = 36000)
 	{		
-		set_transient($prefix.$key, $val, $time);
+		set_transient($key, $val, $time);
 	}
 
 	/**
@@ -41,14 +51,13 @@ abstract class Feed{
 	 * @param  string $prefix 
 	 * @return mixed
 	 */
-	public function getCache($key, $prefix = 'cheched-')
+	public function getCache($key)
 	{		
 		if(self::CACHE_ON)
 		{
-			$cached   = get_transient($prefix.$key);
-			if (false !== $cached) return $cached;	
+			$cached = get_transient($key);
 		}
-		return false;
+		return false !== $cached ? $cached : false;
 	}
 
 	/**
@@ -69,5 +78,11 @@ abstract class Feed{
 	 * @return array           --- messages array
 	 */
 	abstract public function getMessages($count = 5, $offset = 0);	
+
+	/**
+	 * Get feed message/button icon
+	 * @return string
+	 */
+	abstract public function getIcon();
 
 }

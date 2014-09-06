@@ -14,13 +14,14 @@ class Message{
 	private $author;
 	private $picture;
 	private $type; 
+	private $icon;
 
 	//                    __  __              __    
 	//    ____ ___  ___  / /_/ /_  ____  ____/ /____
 	//   / __ `__ \/ _ \/ __/ __ \/ __ \/ __  / ___/
 	//  / / / / / /  __/ /_/ / / / /_/ / /_/ (__  ) 
 	// /_/ /_/ /_/\___/\__/_/ /_/\____/\__,_/____/  
-	public function __construct($text = '', $link = '', $date = '', $author = '', $picture = '', $type = '')
+	public function __construct($text = '', $link = '', $date = '', $author = '', $picture = '', $type = '', $icon = '')
 	{
 		$this->text    = $text;
 		$this->link    = $link;
@@ -28,6 +29,7 @@ class Message{
 		$this->author  = $author;
 		$this->picture = $picture;
 		$this->type    = $type;
+		$this->icon    = (string) $icon;
 	}
 
 	/**

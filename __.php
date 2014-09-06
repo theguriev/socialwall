@@ -128,6 +128,44 @@ class __{
 		return $thumb['0'];
 	}
 
+	/**
+	 * Get contents 
+	 * @param  string $url
+	 * @return string
+	 */
+	public static function fileGetContentsCurl($url) 
+	{
+	    $ch = curl_init();
+
+	    curl_setopt($ch, CURLOPT_HEADER, 0);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+	    curl_setopt($ch, CURLOPT_URL, $url);
+
+	    $data = curl_exec($ch);
+	    curl_close($ch);
+
+	    return $data;
+	}
+
+	/**
+	 * Cut text to a certain length
+	 * EXAMPLE __::cutText('Hellow world!', 8); 
+	 * Before: Hellow world!
+	 * After: Hellow...
+	 * @param  string $str --- string to cut
+	 * @param  int $maxLen --- count symbols
+	 * @return string      --- cutted string
+	 */
+	public static function cutText($str, $maxLen)
+	{
+		if (mb_strlen($str) > $maxLen)
+		{
+			preg_match('/^.{0,'.$maxLen.'} .*?/ui', $str, $match);
+			return $match[0].'...';
+		}
+		return $str;
+	}
+
 }
 
 // =========================================================

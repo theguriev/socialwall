@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: GC feed
-Plugin URI: http://wordpress.org/plugins/gcfeed/
+Plugin Name: GC Social wall
+Plugin URI: http://wordpress.org/plugins/gc_social_wall/
 Description: This plugin helps to export your records from social networks in WordPress blog.
 Author: Guriev Eugen
 Version: 1.0
@@ -10,7 +10,14 @@ Author URI: http://gurievcreative.com
 
 require_once '__.php';
 
-class GCFeed{
+class GCSocialWall{
+	//                          __              __      
+	//   _________  ____  _____/ /_____ _____  / /______
+	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
+	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
+	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
+	const FIELD_FEEDS = 'feeds';	
+
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -19,6 +26,7 @@ class GCFeed{
 	// /_/              /_/                                 
 	private $page_settings;
 	private $agregator;	
+	private $global_settings;
 
 	//                    __  __              __    
 	//    ____ ___  ___  / /_/ /_  ____  ____/ /____
@@ -29,6 +37,7 @@ class GCFeed{
 	{
 		$this->pageSettingsInit();	
 		$this->agregatorInit();	
+		$this->global_settings = $this->getGlobalSettingsOptions();
 		// =========================================================
 		// HOOKS
 		// =========================================================
@@ -36,20 +45,25 @@ class GCFeed{
 		// =========================================================
 		// SHORTCODE
 		// =========================================================
-		add_shortcode('gcfeed', array(&$this, 'updateFeed'));
+		add_shortcode('gc_social_wall', array(&$this, 'updateFeed'));
 	}
 
 	/**
-	 * Add some scripts or styles
+	 * Add some scripts, styles and localizations
 	 */
 	public function scriptsAndStyles()
 	{
 		wp_enqueue_style('font-awesome', \__::FONT_AWESOME_CSS);
-		wp_enqueue_style('gcfeed', GCLIB_URL.'css/gcfeed.css');
+		wp_enqueue_style('gc_social_wall', GCLIB_URL.'css/gc_social_wall.css');
 
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('masonry', GCLIB_URL.'js/masonry.pkgd.min.js', array('jquery'));
-		wp_enqueue_script('gcfeed', GCLIB_URL.'js/gcfeed.js', array('jquery'));
+		wp_enqueue_script('isotope', GCLIB_URL.'js/isotope.pkgd.min.js', array('jquery'));
+		wp_enqueue_script('gc_social_wall', GCLIB_URL.'js/gc_social_wall.js', array('jquery'));
+		wp_localize_script('gc_social_wall', 'gc_social_wall', array(
+			'container'     => '.bricks-content',
+			'item_selector' => '.brick'
+			)
+		);
 	}
 
 	/**
@@ -60,51 +74,57 @@ class GCFeed{
 		$this->agregator = new Feeds\Agregator();
 		$this->agregator->registerFeed(new Feeds\Twitter($this->getTwitterOptions()));
 		$this->agregator->registerFeed(new Feeds\Facebook($this->getFacebookOptions()));
-		$this->agregator->registerFeed(new Feeds\Post($this->getPostTypeOptions()));	
-		
+		$this->agregator->registerFeed(new Feeds\Post($this->getPostTypeOptions()));
+		$this->agregator->registerFeed(new Feeds\YouTube($this->getYouTubeOptions()));			
 	}
 
 	public function updateFeed()
 	{		
-		$feeds = $this->agregator->getFeeds();
-		
-		?>
-		<div class="bricks-content">
-		<?php
-		foreach ($feeds as $messages) 
+		$feeds        = $this->agregator->getFeeds();
+		$msgs_by_time = $this->agregator->getMessages($this->global_settings['count']);
+		$bricks       = '';
+		$feed_buttons = '';
+
+		foreach ($feeds as $feed) 
+		{
+			if($this->global_settings[self::FIELD_FEEDS][$feed->getName()] == 'on')
+				$feed_buttons.= $this->wrapFeedButton($feed);
+		}
+
+		foreach ($msgs_by_time as $messages) 
 		{
 			if(is_array($messages))
 			{
 				foreach ($messages as $msg) 
 				{
-					$this->wrapBrick($msg);
+					if($this->global_settings[self::FIELD_FEEDS][$msg->type] == 'on')
+						$bricks.= $this->wrapBrick($msg);
 				}
 			}
 		}
 		?>
+		<div class="bricks">
+			<nav>
+				<ul class="bricks-buttons">
+					<?php echo $feed_buttons; ?>
+				</ul>
+			</nav>
+			<div class="bricks-content">
+				<?php echo $bricks; ?>
+			</div>
+			<button type="button" onclick="layout(event)">Refresh layout</button>
 		</div>
+		
 		<?php
 	}
 
 	/**
-	 * Get "FONT AWESOME" icon from type
-	 * @param  string $type --- social media type
-	 * @return string       --- font awesome icon
+	 * Wrap single brick to HTML code
+	 * @param  object $obj --- [Message] object - to wrap HTML code
+	 * @return string      --- HTML code
 	 */
-	public function getIconByType($type)
-	{
-		$icons = array(
-			'facebook' => 'fa-facebook',
-			'twitter'  => 'fa-twitter',
-			'post'     => 'fa-wordpress'
-		);
-		if(isset($icons[$type])) return $icons[$type];
-		return '';
-	}
-
 	private function wrapBrick($obj)
 	{
-
 		$img = $obj->picture != '' ? sprintf('<img src="%s">', $obj->picture) : '';
 		$link = sprintf(
 			'<a href="%s" class="link">%s</a><br><small>posted %s</small>',
@@ -112,22 +132,39 @@ class GCFeed{
 			$obj->author,
 			$this->getElapsedTime(strtotime($obj->date))
 		);
+
+		$text = $obj->text == '' ? '' : sprintf('<section><div class="text">%s</div></section>', \__::cutText($obj->text, $this->global_settings['max_symbols'])); 
+		ob_start();
 		?>
 		<div class="brick <?php echo $obj->type; ?>">
 			<div class="brick-type">
-				<i class="fa <?php echo $this->getIconByType($obj->type); ?>"></i>
+				<i class="fa <?php echo $obj->icon; ?>"></i>
 			</div>
 			<header>
 				<?php echo $img; ?>
 			</header>
-			<section>
-				<div class="text"><?php echo $obj->text; ?></div>				
-			</section>
+			<?php echo $text; ?>
 			<footer>
 				<?php echo $link; ?>
 			</footer>
 		</div>
 		<?php
+		$var = ob_get_contents();
+		ob_end_clean();
+		return $var;
+	}
+
+	/**
+	 * Wrap feed switcher button 
+	 * @param  object $feed --- [Feed] object
+	 * @return string       --- HTML code
+	 */
+	private function wrapFeedButton($feed)
+	{
+		return sprintf(
+			'<li class="%1$s"><a href="%1$s" onclick="filterToggle(event, this)"><i class="fa fa-2x %2$s"></i></a></li>', 
+			$feed->getName(), $feed->getIcon()
+		);
 	}
 
 	/**
@@ -201,11 +238,70 @@ class GCFeed{
 			)
 		);
 
+		$ccollection_youtube = new Controls\ControlsCollection(
+			array(		
+				new Controls\Text('Account', array('default-value' => 'vevo'), array('placeholder' => 'YouTube chanel'))
+			)
+		);
+
+		$ccollection_global = new Controls\ControlsCollection(
+			array(		
+				new Controls\Text(
+					'Max symbols', 
+					array(
+						'default-value' => '200',
+						'description'   => 'Maximum symbols per one message. Example if maximum symbols = 8: Hello world! ( before ) | Hello... ( after )'
+					), 
+					array('placeholder' => 'Maximum symbols per message')
+				),
+				new Controls\Text(
+					'Messages per feed', 
+					array(
+						'default-value' => '10',
+						'description'   => 'Limit messages per one feed.'
+					), 
+					array('placeholder' => 'Limit messages per one feed.')
+				),
+				new Controls\Checkbox('Facebook', array('default-value' => 'on', 'label' => 'Show messages from Facebook')),
+				new Controls\Checkbox('Twitter', array('default-value' => 'on', 'label' => 'Show messages from Twiiter')),
+				new Controls\Checkbox('Post type', array('default-value' => 'on', 'label' => 'Show messages from WordPress Post type')),
+				new Controls\Checkbox('YouTube', array('default-value' => 'on', 'label' => 'Show messages from YouTube'))
+			)
+		);
+
 		$section_facebook  = new Admin\Section('Facebook', array('prefix' => 'gc_fb_'), $ccollection_facebook);
 		$section_twitter   = new Admin\Section('Twitter', array('prefix' => 'gc_tw_'), $ccollection_twitter);
 		$section_post_type = new Admin\Section('Post Type', array('prefix' => 'gc_pt_'), $ccollection_post_type);
+		$section_youtube   = new Admin\Section('YouTube', array('prefix' => 'gc_yt_'), $ccollection_youtube);
+		$section_global    = new Admin\Section('Global settings', array('prefix' => 'gc_gs_'), $ccollection_global);
 
-		$this->page_settings = new Admin\Page('GC Feed', array(), array($section_facebook, $section_twitter, $section_post_type));
+		$this->page_settings = new Admin\Page(
+			'GC Social wall', array(), 
+			array(
+				$section_global,
+				$section_facebook, $section_twitter, 
+				$section_post_type, $section_youtube
+			)
+		);
+	}
+
+	/**
+	 * Get Global setting
+	 * @return array --- facebook options
+	 */
+	public function getGlobalSettingsOptions()
+	{
+		return array(
+			'max_symbols' => (int) get_option('gc_gs_max_symbols'),
+			'count'       => (int) get_option('gc_gs_messages_per_feed'),
+			self::FIELD_FEEDS => array(
+				'facebook'    => get_option('gc_gs_facebook'),
+				'twitter'     => get_option('gc_gs_twitter'),
+				'post'        => get_option('gc_gs_post_type'),
+				'youtube'     => get_option('gc_gs_youtube')
+			)
+		);
+		
 	}
 
 	/**
@@ -249,11 +345,22 @@ class GCFeed{
 		);
 	}
 
+	/**
+	 * Get YouTube options
+	 * @return array --- YouTube options
+	 */
+	public function getYouTubeOptions()
+	{
+		return array(
+			'account' => get_option('gc_yt_account')
+		);
+	}
+
 }
 // =========================================================
 // LAUNCH
 // =========================================================
-$GLOBALS['gcfeed'] = new GCFeed();
+$GLOBALS['gc_social_wall'] = new GCSocialWall();
 
 
 

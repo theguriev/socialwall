@@ -43,10 +43,20 @@ class Post extends Feed{
 						$p->post_date,
 						$user->data->user_login,
 						\__::getThumbnailURL($p->ID),
-						$this->getName()
+						$this->getName(),
+						$this->getIcon()
 					));
 			}	
 		}
 		return $messages;
+	}
+
+	/**
+	 * Get feed message/button icon
+	 * @return string
+	 */
+	public function getIcon()
+	{
+		return 'fa-wordpress';
 	}
 }
