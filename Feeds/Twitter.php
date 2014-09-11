@@ -21,21 +21,10 @@ class Twitter extends Feed{
 
 	public function getMessages($count = 5, $offset = 0)
 	{
-		$cache_key = $this->formatCacheKey(
-			array($this->getName(), $count, $offset)
-		);
-
-		$user  = $this->options['account'];		
-		$cache = $this->getCache($cache_key);
-		if($cache)
-		{			
-			return $cache;
-		}
+		$user   = $this->options['account'];		
 		$query  = sprintf('https://api.twitter.com/1.1/statuses/user_timeline.json?count=%s&screen_name=%s', $count, urlencode($user));
 		$tweets = $this->obj->get($query);		
 		$tweets = $this->convert($tweets);
-
-		$this->setCache($cache_key, $tweets, 3600);
 		
 		return $tweets;
 	}
@@ -96,6 +85,21 @@ class Twitter extends Feed{
 	public function getIcon()
 	{
 		return 'fa-twitter';
+	}
+
+	/**
+	 * Get options from database
+	 * @return array --- options collection
+	 */
+	public static function getOptions()
+	{
+		return array(
+			'account'            => get_option('gc_tw_account'),
+			'consumer_key'       => get_option('gc_tw_consumer_key'),
+			'consumer_secret'    => get_option('gc_tw_consumer_secret'),
+			'oauth_token'        => get_option('gc_tw_oauth_token'),
+			'oauth_token_secret' => get_option('gc_tw_oauth_token_secret')
+		);
 	}
 	                                             
 }

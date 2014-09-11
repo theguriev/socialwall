@@ -3,6 +3,12 @@
 namespace Feeds;
 
 class Agregator{
+	//                          __              __      
+	//   _________  ____  _____/ /_____ _____  / /______
+	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
+	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
+	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
+	const CACHE_ON = TRUE;	                                                 
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -57,7 +63,25 @@ class Agregator{
 	{		
 		foreach ($this->feeds as $key => $feed) 
 		{
-			$messages = (array) $feed->getMessages($count, $offset);
+			$hash = $feed->getHashRequestOptions(
+				array(
+					'count'  => $count,
+					'offset' => $offset
+				)
+			);
+			$cache = $this->getCache($hash);
+
+			if($cache !== false)
+			{
+				$messages = $cache;
+			}
+			else
+			{	
+				$messages = (array) $feed->getMessages($count, $offset);
+				$this->setCache($hash, $messages);
+			}
+
+			
 			if(count($messages))
 			{
 				foreach ($messages as &$msg) 
@@ -70,5 +94,32 @@ class Agregator{
 		krsort($posts);
 		
 		return $posts;
+	}
+
+	/**
+	 * Set Cache
+	 * @param string  $key    
+	 * @param string  $val    
+	 * @param integer $time   
+	 * @param string  $prefix 
+	 */
+	public function setCache($key, $val, $time = 36000)
+	{		
+		set_transient($key, $val, $time);
+	}
+
+	/**
+	 * Get Cache
+	 * @param  string $key    
+	 * @param  string $prefix 
+	 * @return mixed
+	 */
+	public function getCache($key)
+	{		
+		if(self::CACHE_ON)
+		{
+			$cached = get_transient($key);
+		}
+		return false !== $cached ? $cached : false;
 	}
 }

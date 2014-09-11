@@ -33,7 +33,6 @@ class __{
 	{			
 		$path = sprintf('%s%s.php', GCLIB_DIR, $class);	
 		$path = str_replace('\\', '/', $path);	
-		$path = strtolower($path);
 		//var_dump($path);
 		if (file_exists($path))
 		{

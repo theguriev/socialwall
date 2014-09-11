@@ -125,12 +125,17 @@ class Page extends Base{
     	if(!is_array($this->sections) OR count($this->sections) <= 0) return '';
     	foreach ($this->sections as $section) 
     	{
-    		$str.= sprintf(
-    			'<a id="options-group-%1$s-tab" class="nav-tab %2$s" title="%3$s" href="#options-group-%1$s">%3$s</a>',
-    			$section->name,
-    			$section->options['class'],
-    			esc_attr($section->title)
-    		);    		
+            if($section instanceof Section)
+            {
+                $str.= sprintf(
+                    '<a id="options-group-%1$s-tab" class="nav-tab %2$s" title="%3$s" href="#options-group-%1$s">%4$s%3$s</a>',
+                    $section->name,
+                    $section->options['class'],
+                    esc_attr($section->title),
+                    $section->getTabIcon()
+                );              
+            }
+    		
     	}
     	return $str;
     }

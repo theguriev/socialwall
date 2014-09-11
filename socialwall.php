@@ -2,7 +2,7 @@
 /*
 Plugin Name: GC Social wall
 Plugin URI: http://wordpress.org/plugins/gc_social_wall/
-Description: This plugin helps to export your records from social networks in WordPress blog.
+Description: This plugin helps to export your records from social networks in WordPress blog. To use it, simply insert this short code [gc_social_wall] in the right place.
 Author: Guriev Eugen
 Version: 1.0
 Author URI: http://gurievcreative.com
@@ -42,10 +42,39 @@ class GCSocialWall{
 		// HOOKS
 		// =========================================================
 		add_action('wp_enqueue_scripts', array(&$this, 'scriptsAndStyles'));
+		add_action('admin_enqueue_scripts', array(&$this, 'adminScriptsAndStyles'));
+		add_action('admin_head', array(&$this, 'addTinyButton'));
 		// =========================================================
 		// SHORTCODE
 		// =========================================================
 		add_shortcode('gc_social_wall', array(&$this, 'updateFeed'));
+	}
+
+	public function adminScriptsAndStyles()
+	{
+		wp_enqueue_style('default-styles', GCLIB_URL.'css/admin.css');
+	}
+
+	public function addTinyButton()
+	{
+	    if (!current_user_can('edit_posts') && !current_user_can('edit_pages')) return;
+		if (get_user_option('rich_editing') == 'true') 
+		{
+			add_filter('mce_external_plugins', array(&$this, 'addTinyPlugin'));
+			add_filter('mce_buttons', array(&$this, 'registerTinyButton'));
+		}
+	}
+
+	public function addTinyPlugin($plugin_array)
+	{
+		$plugin_array['gc_social_wall_button'] = GCLIB_URL.'js/tinymce_button.js';
+		return $plugin_array;
+	}
+
+	public function registerTinyButton($buttons)
+	{
+		array_push($buttons, 'gc_social_wall_button');
+   		return $buttons;
 	}
 
 	/**
@@ -72,10 +101,11 @@ class GCSocialWall{
 	private function agregatorInit()
 	{		
 		$this->agregator = new Feeds\Agregator();
-		$this->agregator->registerFeed(new Feeds\Twitter($this->getTwitterOptions()));
-		$this->agregator->registerFeed(new Feeds\Facebook($this->getFacebookOptions()));
-		$this->agregator->registerFeed(new Feeds\Post($this->getPostTypeOptions()));
-		$this->agregator->registerFeed(new Feeds\YouTube($this->getYouTubeOptions()));			
+		$this->agregator->registerFeed(new Feeds\Twitter());
+		$this->agregator->registerFeed(new Feeds\Facebook());
+		$this->agregator->registerFeed(new Feeds\Post());
+		$this->agregator->registerFeed(new Feeds\YouTube());	
+		$this->agregator->registerFeed(new Feeds\Vimeo());
 	}
 
 	public function updateFeed()
@@ -112,7 +142,6 @@ class GCSocialWall{
 			<div class="bricks-content">
 				<?php echo $bricks; ?>
 			</div>
-			<button type="button" onclick="layout(event)">Refresh layout</button>
 		</div>
 		
 		<?php
@@ -210,6 +239,13 @@ class GCSocialWall{
 	 */
 	private function pageSettingsInit()
 	{
+
+		$ccollection_vimeo = new Controls\ControlsCollection(
+			array(
+				new Controls\Text('Account', array('default-value' => 'whitehouse', array('placeholder' => 'Vimeo account')))
+			)
+		);
+
 		$ccollection_facebook = new Controls\ControlsCollection(
 			array(		
 				new Controls\Text('Account', array('default-value' => 'whitehouse'), array('placeholder' => 'Facebook page')),
@@ -265,22 +301,67 @@ class GCSocialWall{
 				new Controls\Checkbox('Facebook', array('default-value' => 'on', 'label' => 'Show messages from Facebook')),
 				new Controls\Checkbox('Twitter', array('default-value' => 'on', 'label' => 'Show messages from Twiiter')),
 				new Controls\Checkbox('Post type', array('default-value' => 'on', 'label' => 'Show messages from WordPress Post type')),
-				new Controls\Checkbox('YouTube', array('default-value' => 'on', 'label' => 'Show messages from YouTube'))
+				new Controls\Checkbox('YouTube', array('default-value' => 'on', 'label' => 'Show messages from YouTube')),
+				new Controls\Checkbox('Vimeo', array('default-value' => 'on', 'label' => 'Show messages from Vimeo'))
 			)
 		);
+		
+		$section_vimeo = new Admin\Section(
+			'Vimeo',
+			array(
+				'prefix'   => 'gc_v_',
+				'tab_icon' => 'fa-vimeo-square'
+			),
+			$ccollection_vimeo
+		);
 
-		$section_facebook  = new Admin\Section('Facebook', array('prefix' => 'gc_fb_'), $ccollection_facebook);
-		$section_twitter   = new Admin\Section('Twitter', array('prefix' => 'gc_tw_'), $ccollection_twitter);
-		$section_post_type = new Admin\Section('Post Type', array('prefix' => 'gc_pt_'), $ccollection_post_type);
-		$section_youtube   = new Admin\Section('YouTube', array('prefix' => 'gc_yt_'), $ccollection_youtube);
-		$section_global    = new Admin\Section('Global settings', array('prefix' => 'gc_gs_'), $ccollection_global);
+		$section_facebook  = new Admin\Section(
+			'Facebook', 
+			array(
+				'prefix'   => 'gc_fb_',
+				'tab_icon' => 'fa-facebook' 
+			), 
+			$ccollection_facebook
+		);
+		$section_twitter   = new Admin\Section(
+			'Twitter', 
+			array(
+				'prefix'   => 'gc_tw_',
+				'tab_icon' => 'fa-twitter' 
+			), 
+			$ccollection_twitter
+		);
+		$section_post_type = new Admin\Section(
+			'Post Type', 
+			array(
+				'prefix'   => 'gc_pt_',
+				'tab_icon' => 'fa-wordpress' 
+			), 
+			$ccollection_post_type
+		);
+		$section_youtube   = new Admin\Section(
+			'YouTube', 
+			array(
+				'prefix'   => 'gc_yt_',
+				'tab_icon' => 'fa-youtube' 
+			), 
+			$ccollection_youtube
+		);
+		$section_global    = new Admin\Section(
+			'Global settings', 
+			array(
+				'prefix'   => 'gc_gs_',
+				'tab_icon' => 'fa-cog'
+			), 
+			$ccollection_global
+		);
 
 		$this->page_settings = new Admin\Page(
 			'GC Social wall', array(), 
 			array(
-				$section_global,
-				$section_facebook, $section_twitter, 
-				$section_post_type, $section_youtube
+				$section_global, $section_facebook,
+				$section_twitter, $section_post_type,
+				$section_youtube, $section_vimeo
 			)
 		);
 	}
@@ -298,64 +379,12 @@ class GCSocialWall{
 				'facebook'    => get_option('gc_gs_facebook'),
 				'twitter'     => get_option('gc_gs_twitter'),
 				'post'        => get_option('gc_gs_post_type'),
-				'youtube'     => get_option('gc_gs_youtube')
+				'youtube'     => get_option('gc_gs_youtube'),
+				'vimeo'       => get_option('gc_gs_vimeo')
 			)
 		);
 		
 	}
-
-	/**
-	 * Get facebook options
-	 * @return array --- facebook options
-	 */
-	public function getFacebookOptions()
-	{
-		return array(
-			'account' => get_option('gc_fb_account'),
-			'app_id'  => get_option('gc_fb_app_id'),
-			'app_key' => get_option('gc_fb_app_key')
-		);
-		
-	}
-
-	/**
-	 * Get twitter options
-	 * @return array --- twitter options
-	 */
-	public function getTwitterOptions()
-	{
-		return array(
-			'account'            => get_option('gc_tw_account'),
-			'consumer_key'       => get_option('gc_tw_consumer_key'),
-			'consumer_secret'    => get_option('gc_tw_consumer_secret'),
-			'oauth_token'        => get_option('gc_tw_oauth_token'),
-			'oauth_token_secret' => get_option('gc_tw_oauth_token_secret')
-		);
-	}
-
-	/**
-	 * Get post type options
-	 * @return array --- post type options
-	 */
-	public function getPostTypeOptions()
-	{
-		return array(
-			'post_type' => get_option('gc_pt_post_type'),
-			'include'   => get_option('gc_pt_include_categories')
-		);
-	}
-
-	/**
-	 * Get YouTube options
-	 * @return array --- YouTube options
-	 */
-	public function getYouTubeOptions()
-	{
-		return array(
-			'account' => get_option('gc_yt_account')
-		);
-	}
-
 }
 // =========================================================
 // LAUNCH

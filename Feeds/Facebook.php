@@ -29,17 +29,9 @@ class Facebook extends Feed{
 
 	public function getMessages($count = 5, $offset = 0)
 	{
-		$cache_key = $this->formatCacheKey(
-			array($this->getName(), $count, $offset)
-		);
 		$ids       = $this->getIDs($count);
 		$objects   = array();
 		$user      = $this->options['account'];
-		$cache     = $this->getCache($cache_key);	
-		if($cache)
-		{			
-			return $cache;
-		}	
 	
 		if(!is_array($ids)) return false;
 		foreach ($ids as $id) 
@@ -54,7 +46,6 @@ class Facebook extends Feed{
 		}
 		$feed = $this->convert($objects);
 
-		$this->setCache($cache_key, $feed);
 		return $feed;
 	}
 
@@ -147,5 +138,18 @@ class Facebook extends Feed{
 	public function getIcon()
 	{
 		return 'fa-facebook';
-	}                    
+	}      
+
+	/**
+	 * Get options from database
+	 * @return array --- options collection
+	 */
+	public static function getOptions()
+	{
+		return array(
+			'account' => get_option('gc_fb_account'),
+			'app_id'  => get_option('gc_fb_app_id'),
+			'app_key' => get_option('gc_fb_app_key')
+		);
+	}  
 }

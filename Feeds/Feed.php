@@ -3,7 +3,6 @@
 namespace Feeds;
 
 abstract class Feed{
-	const CACHE_ON = TRUE;
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -20,6 +19,7 @@ abstract class Feed{
 	// /_/ /_/ /_/\___/\__/_/ /_/\____/\__,_/____/  
 	public function __construct($options)
 	{
+		if(!count($options)) $options = static::getOptions();
 		$this->options = $options;
 	}
 
@@ -28,36 +28,24 @@ abstract class Feed{
 	 * @param  array  $properties --- key pieces
 	 * @return string
 	 */
-	public function formatCacheKey($properties = array())
+	public function formatCacheKey($properties)
 	{
-		return md5(implode('_', $properties));
+		if(is_array($properties)) $properties = implode('_', $properties);
+		return md5($properties);
 	}
 
 	/**
-	 * Set Cache
-	 * @param string  $key    
-	 * @param string  $val    
-	 * @param integer $time   
-	 * @param string  $prefix 
+	 * Get hash (md5) request
+	 * @return string --- md5
 	 */
-	public function setCache($key, $val, $time = 36000)
-	{		
-		set_transient($key, $val, $time);
-	}
+	public function getHashRequestOptions($options = array())
+	{
+		$options         = array_merge($this->options, $options);
+		$options['name'] = $this->getName();
 
-	/**
-	 * Get Cache
-	 * @param  string $key    
-	 * @param  string $prefix 
-	 * @return mixed
-	 */
-	public function getCache($key)
-	{		
-		if(self::CACHE_ON)
-		{
-			$cached = get_transient($key);
-		}
-		return false !== $cached ? $cached : false;
+		$options = \__::joinArray($options);
+
+		return $this->formatCacheKey($options);
 	}
 
 	/**
@@ -84,5 +72,11 @@ abstract class Feed{
 	 * @return string
 	 */
 	abstract public function getIcon();
+
+	/**
+	 * Get options from database
+	 * @return array --- options collection
+	 */
+	abstract public static function getOptions();
 
 }

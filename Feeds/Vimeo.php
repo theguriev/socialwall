@@ -1,7 +1,14 @@
 <?php
 namespace Feeds;
 
-class Post extends Feed{
+class Vimeo extends Feed{
+	//                     __             __      
+	//   _________  ____  / /____  ____  / /______
+	//  / ___/ __ \/ __ \/ __/ _ \/ __ \/ __/ ___/
+	// / /__/ /_/ / / / / /_/  __/ / / / /_(__  ) 
+	// \___/\____/_/ /_/\__/\___/_/ /_/\__/____/  
+	const VIDEOS_URL    = 'http://vimeo.com/api/v2/%s/videos.json';	
+
 	//                    __  __              __    
 	//    ____ ___  ___  / /_/ /_  ____  ____/ /____
 	//   / __ `__ \/ _ \/ __/ __ \/ __ \/ __  / ___/
@@ -14,19 +21,11 @@ class Post extends Feed{
 
 	public function getMessages($count = 5, $offset = 0)
 	{
-		$args = array(
-			'posts_per_page'   => $count,
-			'offset'           => $offset,
-			'orderby'          => 'post_date',
-			'order'            => 'DESC',
-			'post_type'        => 'post',
-			'post_status'      => 'publish',
-			'suppress_filters' => true 
-		);
-		$args  = array_merge($args, $this->options);		
-		$posts = get_posts($args);
+		$json = \__::fileGetContentsCurl(sprintf(self::VIDEOS_URL, $this->options['account']));
+		$json = json_decode($json);
+		$json = array_splice($json, $offset, $count);
 		
-		return $this->convert($posts);
+		return $this->convert($json);
 	}
 
 	public function convert($arr)
@@ -34,15 +33,14 @@ class Post extends Feed{
 		$messages = array();				
 		if(is_array($arr))
 		{
-			foreach ($arr as $p) 
+			foreach ($arr as $el) 
 			{	
-				$user = get_user_by('id', $p->post_author); 				
 				array_push($messages, new Message(
-						$p->post_content,
-						get_permalink($p->ID),
-						$p->post_date,
-						$user->data->user_login,
-						\__::getThumbnailURL($p->ID),
+						strip_tags($el->description),
+						$el->url,
+						$el->upload_date,
+						$el->title,
+						$el->thumbnail_large,
 						$this->getName(),
 						$this->getIcon()
 					));
@@ -57,7 +55,7 @@ class Post extends Feed{
 	 */
 	public function getIcon()
 	{
-		return 'fa-wordpress';
+		return 'fa-vimeo-square';
 	}
 
 	/**
@@ -67,8 +65,7 @@ class Post extends Feed{
 	public static function getOptions()
 	{
 		return array(
-			'post_type' => get_option('gc_pt_post_type'),
-			'include'   => get_option('gc_pt_include_categories')
+			'account' => get_option('gc_v_account')
 		);
 	}
 }

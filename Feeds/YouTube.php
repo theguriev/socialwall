@@ -93,4 +93,15 @@ class YouTube extends Feed{
 	{
 		return 'fa-youtube';
 	}
+
+	/**
+	 * Get options from database
+	 * @return array --- options collection
+	 */
+	public static function getOptions()
+	{
+		return array(
+			'account' => get_option('gc_yt_account')
+		);
+	}
 }

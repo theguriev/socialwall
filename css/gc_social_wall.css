@@ -158,6 +158,24 @@
 	background: transparent;	
 }
 
+.bricks .bricks-content .brick.vimeo footer,
+.bricks .bricks-content .brick.vimeo .brick-type{
+	background: #1ab7ea;
+}
+
+.bricks nav ul.bricks-buttons li.vimeo.filter a:hover,
+.bricks nav ul.bricks-buttons li.vimeo a{
+	background: #1ab7ea;
+	color: white;
+	border-color: transparent;
+}
+
+.bricks nav ul.bricks-buttons li.vimeo.filter a,
+.bricks nav ul.bricks-buttons li.vimeo a:hover{
+	color: #1ab7ea;
+	border-color: #1ab7ea;
+	background: transparent;	
+}
 
 
 

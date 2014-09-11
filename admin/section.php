@@ -17,10 +17,33 @@ class Section extends BaseWithControls{
 	// /_/ /_/ /_/\___/\__/_/ /_/\____/\__,_/____/  
 	public function __construct($title, $args = array(), \Controls\ControlsCollection $controls = null)
 	{
-		$args = array_merge(array('class' => ''), $args);
+		$args = array_merge(array('class' => '', 'tab_icon' => ''), $args);
 		parent::__construct($title, $args, $controls);
 		$this->prefix = isset($this->options['prefix']) ? $this->options['prefix'] : $this->name.'_';
 		$this->setDefaults();
+	}
+
+	/**
+	 * Get tab icon.
+	 * You can choose your icon here http://fortawesome.github.io/Font-Awesome/icons/
+	 * @return string --- HTML code
+	 */
+	public function getTabIcon()
+	{
+		if(strlen($this->options['tab_icon']))
+		{
+			ob_start();
+			?>
+			<span class="fa-stack">
+			  <i class="fa fa-stop fa-stack-2x"></i>
+			  <i class="fa <?php echo $this->options['tab_icon']; ?> fa-stack-1x fa-inverse"></i>
+			</span>
+			<?php
+			$var = ob_get_contents();
+			ob_end_clean();
+			return $var;
+		}
+		return '';
 	}
 
 	/**

@@ -1,0 +1,21 @@
+i.mce-i-gc_cocial_wall {
+	background: url(../images/wall.png) no-repeat;
+}
+
+#adminmenu #toplevel_page_gc_social_wall .wp-menu-image:before {
+	content: "";  
+	background: url("../images/wall999.png") no-repeat scroll 0px 6px rgba(0, 0, 0, 0);
+}
+
+#adminmenu #toplevel_page_gc_social_wall:hover .wp-menu-image:before {
+	content: "";  
+	background: url("../images/wall2ea2cc.png") no-repeat scroll 0px 6px rgba(0, 0, 0, 0);
+}
+
+#adminmenu #toplevel_page_gc_social_wall.current .wp-menu-image:before,
+#adminmenu #toplevel_page_gc_social_wall.current:hover .wp-menu-image:before{
+	content: "";  
+	background: url("../images/wallfff.png") no-repeat scroll 0px 6px rgba(0, 0, 0, 0);
+}
+
+#adminmenu .current div.wp-menu-image:before, #adminmenu .wp-has-current-submenu div.wp-menu-image:before, #adminmenu a.current:hover div.wp-menu-image:before, #adminmenu a.wp-has-current-submenu:hover div.wp-menu-image:before, #adminmenu li.wp-has-current-submenu:hover div.wp-menu-image:before

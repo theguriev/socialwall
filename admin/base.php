@@ -19,8 +19,9 @@ abstract class Base{
 	// /_/ /_/ /_/\___/\__/_/ /_/\____/\__,_/____/  
 	public function __construct($title, $args = array())
 	{
-		$this->title    = $title;			
-		$this->name     = $this->options['name'] ? $this->options['name'] : \__::formatName($title);		
+		$this->title    = $title;		
+		$this->options  = $args;	
+		$this->name     = isset($this->options['name']) ? $this->options['name'] : \__::formatName($title);		
 		$this->options  = $args;
 
 		$this->options['name'] = $this->name;
