@@ -1,9 +1,9 @@
-=== GCSocialWall ===
+=== GC Social Wall ===
 Contributors: Guriev Eugen
 Tags: facebook, twitter, youtube, social stream, social wall
-Requires at least: 1.0
+Requires at least: 1.02
 Tested up to: 4.0
-Stable tag: 1.0
+Stable tag: 1.02
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,6 +13,17 @@ This plugin helps to export your records from social networks in WordPress blog.
 
 This plugin helps to export your records from social networks in WordPress blog.
 Demo link: http://site3.gurievcreative.com
+Support Link: http://gurievcreative.com/
+Support email: gurievcreative@gmail.com
+
+How to setup GC Social Wall
+[youtube https://www.youtube.com/watch?v=DRvX3XhowIU]
+
+How to change default icon to fonwawesome icon
+[youtube https://www.youtube.com/watch?v=e63ui-I0Ze8]
+
+How to change default icon to custom icon
+[youtube https://www.youtube.com/watch?v=3v5FX-ybqK4]
 
 == Installation ==
 
@@ -34,9 +45,20 @@ Demo link: http://site3.gurievcreative.com
 
 == Frequently Asked Questions ==
 
-= Do you have some quick video guid how to setup GC Social Wall =
+= Do you have some quick video guid how to setup GC Social Wall? =
 
 Yeah. You can find this guid here https://www.youtube.com/watch?v=DRvX3XhowIU
+[youtube https://www.youtube.com/watch?v=DRvX3XhowIU]
+
+= How to change the icons? =
+
+In this two video tutorials shows how to do it
+
+How to change default icon to fonwawesome icon
+[youtube https://www.youtube.com/watch?v=e63ui-I0Ze8]
+
+How to change default icon to custom icon
+[youtube https://www.youtube.com/watch?v=3v5FX-ybqK4]
 
 == Screenshots ==
 
@@ -47,9 +69,15 @@ Yeah. You can find this guid here https://www.youtube.com/watch?v=DRvX3XhowIU
 
 = 1.0 =
 * This is a first version.
+
 = 1.01 =
 * Add some css to admin settings.
 * Add button to tinyMCE editor.
 * Add vimeo feed.
-* Refactoring feed options code
-* Refactoring cache system code
+* Refactoring feed options code.
+* Refactoring cache system code.
+* Added the ability to change the icons.
+
+= 1.02 =
+* Added some fixes to css.
+* Added share buttons.

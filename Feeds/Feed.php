@@ -42,6 +42,7 @@ abstract class Feed{
 	{
 		$options         = array_merge($this->options, $options);
 		$options['name'] = $this->getName();
+		$options['icon'] = $this->getIcon(); // Will be update after changing icon
 
 		$options = \__::joinArray($options);
 
@@ -60,6 +61,18 @@ abstract class Feed{
 	}
 
 	/**
+	 * Get feed message/button icon
+	 * @return string
+	 */
+	public function getIcon()
+	{
+		$options = array_merge(array('icon' => ''), $this->options);
+		$icon = (string) $options['icon'];
+		if(strlen($icon)) return $icon;
+		return static::getDefaultIcon();
+	}
+
+	/**
 	 * Get formatted messages
 	 * @param  integer $count  --- messages to return
 	 * @param  integer $offset --- offset messages
@@ -71,7 +84,7 @@ abstract class Feed{
 	 * Get feed message/button icon
 	 * @return string
 	 */
-	abstract public function getIcon();
+	abstract public static function getDefaultIcon();
 
 	/**
 	 * Get options from database

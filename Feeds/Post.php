@@ -52,10 +52,10 @@ class Post extends Feed{
 	}
 
 	/**
-	 * Get feed message/button icon
+	 * Get feed message/button default icon
 	 * @return string
 	 */
-	public function getIcon()
+	public static function getDefaultIcon()
 	{
 		return 'fa-wordpress';
 	}
@@ -68,7 +68,8 @@ class Post extends Feed{
 	{
 		return array(
 			'post_type' => get_option('gc_pt_post_type'),
-			'include'   => get_option('gc_pt_include_categories')
+			'include'   => get_option('gc_pt_include_categories'),
+			'icon'      => get_option('gc_pt_custom_icon')
 		);
 	}
 }

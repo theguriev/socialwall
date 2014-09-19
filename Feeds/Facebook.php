@@ -132,10 +132,10 @@ class Facebook extends Feed{
 	}         
 
 	/**
-	 * Get feed message/button icon
+	 * Get feed message/button default icon
 	 * @return string
 	 */
-	public function getIcon()
+	public static function getDefaultIcon()
 	{
 		return 'fa-facebook';
 	}      
@@ -149,7 +149,8 @@ class Facebook extends Feed{
 		return array(
 			'account' => get_option('gc_fb_account'),
 			'app_id'  => get_option('gc_fb_app_id'),
-			'app_key' => get_option('gc_fb_app_key')
+			'app_key' => get_option('gc_fb_app_key'),
+			'icon'    => get_option('gc_fb_custom_icon')
 		);
 	}  
 }

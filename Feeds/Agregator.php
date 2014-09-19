@@ -8,7 +8,7 @@ class Agregator{
 	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
 	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
-	const CACHE_ON = TRUE;	                                                 
+	const CACHE_ON = false;	                                                 
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -63,7 +63,7 @@ class Agregator{
 	{		
 		foreach ($this->feeds as $key => $feed) 
 		{
-			$hash = $feed->getHashRequestOptions(
+			$hash  = $feed->getHashRequestOptions(
 				array(
 					'count'  => $count,
 					'offset' => $offset
@@ -82,7 +82,7 @@ class Agregator{
 			}
 
 			
-			if(count($messages))
+			if(is_array($messages) AND count($messages))
 			{
 				foreach ($messages as &$msg) 
 				{
@@ -115,7 +115,8 @@ class Agregator{
 	 * @return mixed
 	 */
 	public function getCache($key)
-	{		
+	{	
+		$cached = false;	
 		if(self::CACHE_ON)
 		{
 			$cached = get_transient($key);

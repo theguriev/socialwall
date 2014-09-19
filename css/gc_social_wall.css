@@ -28,27 +28,57 @@
 
 .bricks .bricks-content .brick{
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.22);
+	overflow: hidden;
 	display: block;
 	float: left;
-	width: 300px;
+	width: 236px;
+	border-radius: 6px;
 	margin: 0 0 10px 0;
 }
 
-.bricks .bricks-content .brick .brick-type{
+.bricks .bricks-content .brick .share-panel{
+	left: 30px;
+	list-style: none outside none;
+	opacity: 1;
 	position: absolute;
-	top: 30px;
-	left: 0;
-	display: block;
-	width: 30px;
-	height: 30px;	
-	text-align: center;
-	-webkit-transition: all 0.3s ease-out 0.1s;
-	        transition: all 0.3s ease-out 0.1s;
+	top: -15px;
+	transition: all 0.3s ease-out 0.1s;
+	opacity: 0;
 }
 
-.bricks .bricks-content .brick .brick-type:hover{
-	opacity: 0;
+.bricks .bricks-content .brick .share-panel li{
+	margin: 0 5px;
+	display: inline-block;
+}
+
+.bricks .bricks-content .brick .share-panel li a{
+	display: block;
+	height: 30px;
+	width: 30px;
+	line-height: 30px;
+	text-align: center;	
+	border: 1px solid transparent;
+	border-radius: 50%;
+}
+
+
+.bricks .bricks-content .brick:hover .share-panel{
+	top: 15px;
+	opacity: 1;
+	z-index: 3;
+}
+
+.bricks .bricks-content .brick .brick-type{
+	border-radius: 50%;
+	display: block;
+	height: 30px;
+	left: 10px;
+	position: absolute;
+	text-align: center;
+	top: 25px;
+	transition: all 0.3s ease-out 0.1s;
+	width: 30px;
 }
 
 .bricks .bricks-content .brick .brick-type i{
@@ -63,26 +93,47 @@
 .bricks .bricks-content .brick header img{
 	width: 100%;
 	border-radius: 0;
+	float: left;
 }
 
 .bricks .bricks-content .brick section{
 	padding: 20px;
+	overflow: hidden;
 }
 
 .brick footer{
-	text-align: center;
-	padding: 15px;
-	color: white;
+	text-align: left;
+	border-top: 1px solid #e7e7e7;
+	position: relative;
+	float: left;
+	width: 100%;
 }
 
 .brick footer a{
-	color: white;
-	text-decoration: none;
+	display: block;
 	font-weight: bold;
+	padding: 15px 15px 15px 50px;
+	text-decoration: none;
+}
+
+.brick footer a:hover{
+	background: #f1f1f1;
+}
+
+.brick footer a .txt{
+	color: #222;
+}
+
+.brick footer a .txt small{
+	color: gray;
+	font-weight: normal;
+}
+
+.brick footer a:visited{
+	text-decoration: underline;
 }
 
 /*COLORS*/
-.bricks .bricks-content .brick.twitter footer,
 .bricks .bricks-content .brick.twitter .brick-type{
 	background: #55acee;
 }
@@ -101,7 +152,6 @@
 	border-color: #55acee;
 }
 
-.bricks .bricks-content .brick.facebook footer,
 .bricks .bricks-content .brick.facebook .brick-type{
 	background: #3b5998;
 }
@@ -120,7 +170,6 @@
 	background: transparent;
 }
 
-.bricks .bricks-content .brick.post footer,
 .bricks .bricks-content .brick.post .brick-type{
 	background: #222222;
 }
@@ -139,7 +188,6 @@
 	background: transparent;	
 }
 
-.bricks .bricks-content .brick.youtube footer,
 .bricks .bricks-content .brick.youtube .brick-type{
 	background: #b31217;
 }
@@ -158,7 +206,6 @@
 	background: transparent;	
 }
 
-.bricks .bricks-content .brick.vimeo footer,
 .bricks .bricks-content .brick.vimeo .brick-type{
 	background: #1ab7ea;
 }
@@ -175,6 +222,52 @@
 	color: #1ab7ea;
 	border-color: #1ab7ea;
 	background: transparent;	
+}
+
+/* SHARE PANEL COLORS */
+
+.bricks .bricks-content .brick .share-panel li.facebook a{
+	background: #3b5998;
+	color: white;
+}
+
+.bricks .bricks-content .brick .share-panel li.facebook a:hover{
+	border-color: #3b5998;
+	background: transparent;
+	color: #3b5998;
+}
+
+.bricks .bricks-content .brick .share-panel li.twitter a{
+	background: #55acee;
+	color: white;
+}
+
+.bricks .bricks-content .brick .share-panel li.twitter a:hover{
+	border-color: #55acee;
+	background: transparent;
+	color: #55acee;
+}
+
+.bricks .bricks-content .brick .share-panel li.google-plus a{
+	background: #dd4b39;
+	color: white;
+}
+
+.bricks .bricks-content .brick .share-panel li.google-plus a:hover{
+	border-color: #dd4b39;
+	background: transparent;
+	color: #dd4b39;	
+}
+
+.bricks .bricks-content .brick .share-panel li.linkedin a{
+	background: #007bb6;
+	color: white;
+}
+
+.bricks .bricks-content .brick .share-panel li.linkedin a:hover{
+	border-color: #007bb6;
+	background: transparent;
+	color: #007bb6;	
 }
 
 

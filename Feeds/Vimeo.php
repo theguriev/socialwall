@@ -22,7 +22,7 @@ class Vimeo extends Feed{
 	public function getMessages($count = 5, $offset = 0)
 	{
 		$json = \__::fileGetContentsCurl(sprintf(self::VIDEOS_URL, $this->options['account']));
-		$json = json_decode($json);
+		$json = (array) json_decode($json);
 		$json = array_splice($json, $offset, $count);
 		
 		return $this->convert($json);
@@ -50,10 +50,10 @@ class Vimeo extends Feed{
 	}
 
 	/**
-	 * Get feed message/button icon
+	 * Get feed message/button default icon
 	 * @return string
 	 */
-	public function getIcon()
+	public static function getDefaultIcon()
 	{
 		return 'fa-vimeo-square';
 	}
@@ -65,7 +65,8 @@ class Vimeo extends Feed{
 	public static function getOptions()
 	{
 		return array(
-			'account' => get_option('gc_v_account')
+			'account' => get_option('gc_v_account'),
+			'icon'    => get_option('gc_v_custom_icon')
 		);
 	}
 }

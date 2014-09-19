@@ -5,9 +5,21 @@ jQuery(window).load(function(){
 	isotopeInit();
 });
 
+/**
+ * Popup for share buttons
+ * @param  object obj   --- button
+ * @param  object event --- event
+ */
+function sharePopup(obj, event)
+{
+	var href = jQuery(obj).attr('href');
+	window.open(href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');
+	event.preventDefault();
+}
+
 function layout()
 {
-	jQuery(gc_social_wall.container).isotope('layout');
+	jQuery(gc_social_wall.container).masonry('layout');
 }
 
 /**
@@ -15,13 +27,10 @@ function layout()
  */
 function isotopeInit()
 {
-	jQuery(gc_social_wall.container).isotope({
+	jQuery(gc_social_wall.container).masonry({
 		itemSelector: gc_social_wall.item_selector,
-		layoutMode: 'masonry',
-		masonry:{
-			gutter: 10,
-			columnWidth: 300
-		}
+		gutter: 10,
+		columnWidth: 236
 	});
 }
 
@@ -43,7 +52,7 @@ function filterToggle(event, obj)
 			hideBricksByFeed(jQuery(this).parent().parent().parent(), jQuery(this).find('a').attr('href'));
 		}
 	});
-	jQuery(gc_social_wall.container).isotope('layout');
+	jQuery(gc_social_wall.container).masonry('layout');
 	event.preventDefault();
 }
 

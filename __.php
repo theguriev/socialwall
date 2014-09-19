@@ -10,7 +10,7 @@ class __{
 	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
 	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
-	const FONT_AWESOME_CSS = '//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css';	
+	const FONT_AWESOME_CSS = '//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css';	
 	const BASE_CSS         = '/css/base.css';
 	                                                 
 	//                    __  __              __    
@@ -33,7 +33,6 @@ class __{
 	{			
 		$path = sprintf('%s%s.php', GCLIB_DIR, $class);	
 		$path = str_replace('\\', '/', $path);	
-		//var_dump($path);
 		if (file_exists($path))
 		{
 			require_once $path;

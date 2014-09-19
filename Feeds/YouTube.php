@@ -86,10 +86,10 @@ class YouTube extends Feed{
 	}
 
 	/**
-	 * Get feed message/button icon
+	 * Get feed message/button default icon
 	 * @return string
 	 */
-	public function getIcon()
+	public static function getDefaultIcon()
 	{
 		return 'fa-youtube';
 	}
@@ -101,7 +101,8 @@ class YouTube extends Feed{
 	public static function getOptions()
 	{
 		return array(
-			'account' => get_option('gc_yt_account')
+			'account' => get_option('gc_yt_account'),
+			'icon'    => get_option('gc_yt_custom_icon')
 		);
 	}
 }

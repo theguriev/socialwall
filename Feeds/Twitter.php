@@ -79,10 +79,10 @@ class Twitter extends Feed{
 	}
 
 	/**
-	 * Get feed message/button icon
+	 * Get feed message/button default icon
 	 * @return string
 	 */
-	public function getIcon()
+	public static function getDefaultIcon()
 	{
 		return 'fa-twitter';
 	}
@@ -98,7 +98,8 @@ class Twitter extends Feed{
 			'consumer_key'       => get_option('gc_tw_consumer_key'),
 			'consumer_secret'    => get_option('gc_tw_consumer_secret'),
 			'oauth_token'        => get_option('gc_tw_oauth_token'),
-			'oauth_token_secret' => get_option('gc_tw_oauth_token_secret')
+			'oauth_token_secret' => get_option('gc_tw_oauth_token_secret'),
+			'icon'    			 => get_option('gc_tw_custom_icon')
 		);
 	}
 	                                             

@@ -4,7 +4,7 @@ Plugin Name: GC Social wall
 Plugin URI: http://wordpress.org/plugins/gc_social_wall/
 Description: This plugin helps to export your records from social networks in WordPress blog. To use it, simply insert this short code [gc_social_wall] in the right place.
 Author: Guriev Eugen
-Version: 1.0
+Version: 1.02
 Author URI: http://gurievcreative.com
 */
 
@@ -16,7 +16,11 @@ class GCSocialWall{
 	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
 	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
-	const FIELD_FEEDS = 'feeds';	
+	const FIELD_FEEDS           = 'feeds';	
+	const SHARE_URL_FACEBOOK    = 'http://www.facebook.com/sharer.php?u=%s';
+	const SHARE_URL_TWITTER     = 'https://twitter.com/share?url=%s&via=%s';
+	const SHARE_URL_GOOGLE_PLUS = 'https://plus.google.com/share?url=%s';
+	const SHARE_URL_LINKEDIN    = 'http://www.linkedin.com/shareArticle?mini=true&url=%s';
 
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
@@ -86,7 +90,7 @@ class GCSocialWall{
 		wp_enqueue_style('gc_social_wall', GCLIB_URL.'css/gc_social_wall.css');
 
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('isotope', GCLIB_URL.'js/isotope.pkgd.min.js', array('jquery'));
+		wp_enqueue_script('masonry', GCLIB_URL.'js/masonry.js', array('jquery'));
 		wp_enqueue_script('gc_social_wall', GCLIB_URL.'js/gc_social_wall.js', array('jquery'));
 		wp_localize_script('gc_social_wall', 'gc_social_wall', array(
 			'container'     => '.bricks-content',
@@ -106,6 +110,7 @@ class GCSocialWall{
 		$this->agregator->registerFeed(new Feeds\Post());
 		$this->agregator->registerFeed(new Feeds\YouTube());	
 		$this->agregator->registerFeed(new Feeds\Vimeo());
+		$this->agregator->registerFeed(new Feeds\Instagram());
 	}
 
 	public function updateFeed()
@@ -154,10 +159,12 @@ class GCSocialWall{
 	 */
 	private function wrapBrick($obj)
 	{
+		$twitter_account = Feeds\Twitter::getOptions();
+		$twitter_account = isset($twitter_account['account']) ? $twitter_account['account'] : '';
+
 		$img = $obj->picture != '' ? sprintf('<img src="%s">', $obj->picture) : '';
-		$link = sprintf(
-			'<a href="%s" class="link">%s</a><br><small>posted %s</small>',
-			$obj->link,
+		$link_text = sprintf(
+			'%s<br><small>posted %s</small>',
 			$obj->author,
 			$this->getElapsedTime(strtotime($obj->date))
 		);
@@ -166,15 +173,41 @@ class GCSocialWall{
 		ob_start();
 		?>
 		<div class="brick <?php echo $obj->type; ?>">
-			<div class="brick-type">
-				<i class="fa <?php echo $obj->icon; ?>"></i>
-			</div>
+			<ul class="share-panel">
+				<li class="facebook">
+					<a href="<?php printf(self::SHARE_URL_FACEBOOK, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
+						<i class="fa fa-facebook"></i>
+					</a>
+				</li>
+				<li class="twitter">
+					<a href="<?php printf(self::SHARE_URL_TWITTER, urlencode($obj->link), $twitter_account); ?>" onclick="sharePopup(this, event)">
+						<i class="fa fa-twitter"></i>
+					</a>
+				</li>
+				<li class="google-plus">
+					<a href="<?php printf(self::SHARE_URL_GOOGLE_PLUS, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
+						<i class="fa fa-google-plus"></i>
+					</a>
+				</li>
+				<li class="linkedin">
+					<a href="<?php printf(self::SHARE_URL_LINKEDIN, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
+						<i class="fa fa-linkedin"></i>
+					</a>
+				</li>
+			</ul>
 			<header>
 				<?php echo $img; ?>
 			</header>
 			<?php echo $text; ?>
 			<footer>
-				<?php echo $link; ?>
+				<a href="<?php echo $obj->link; ?>" target="_blank">
+					<div class="brick-type">
+						<i class="fa <?php echo $obj->icon; ?>"></i>
+					</div>
+					<div class="txt">
+						<?php echo $link_text; ?>		
+					</div>
+				</a>
 			</footer>
 		</div>
 		<?php
@@ -202,9 +235,10 @@ class GCSocialWall{
 	 */
 	public function getElapsedTime($time)
 	{
-		$str  = '';
-		$time = time() - $time;
-		$res  = array(
+		$str   = '';
+		$items = array();
+		$time  = time() - $time;
+		$res   = array(
 			'year'   => 0,
 			'month'  => 0,
 			'day'    => 0,
@@ -229,9 +263,10 @@ class GCSocialWall{
 	    foreach ($res as $key => $value) 
 	    {
 	    	if(!intval($value)) continue;
-	    	$str.= $value.' '.$key.' ';
+	    	$items[] = $value.' '.$key.' ';
 	    }    
-	    return $str.' ago';
+	    $items = array_slice($items, 0, 2);
+	    return implode(' ', $items).' ago';
 	}
 
 	/**
@@ -242,7 +277,16 @@ class GCSocialWall{
 
 		$ccollection_vimeo = new Controls\ControlsCollection(
 			array(
-				new Controls\Text('Account', array('default-value' => 'whitehouse', array('placeholder' => 'Vimeo account')))
+				new Controls\Text(
+					'Account', 
+					array('default-value' => 'user4075991'),
+					array('placeholder' => 'Vimeo account')
+				),
+				new Controls\Text(
+					'Custom icon', 
+					array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-vimeo-square'), 
+					array('placeholder' => 'Icon')
+				)
 			)
 		);
 
@@ -250,7 +294,8 @@ class GCSocialWall{
 			array(		
 				new Controls\Text('Account', array('default-value' => 'whitehouse'), array('placeholder' => 'Facebook page')),
 				new Controls\Text('APP ID', array('default-value' => '802383316448078'), array('placeholder' => 'Application ID')),
-				new Controls\Text('APP KEY', array('default-value' => '970b61246640d52ac45bfa8bf596e6d5'), array('placeholder' => 'Application key'))
+				new Controls\Text('APP KEY', array('default-value' => '970b61246640d52ac45bfa8bf596e6d5'), array('placeholder' => 'Application key')),
+				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-facebook'), array('placeholder' => 'Icon'))
 			)
 		);
 
@@ -260,7 +305,8 @@ class GCSocialWall{
 				new Controls\Text('Consumer key', array('default-value' => 'aMY4Zsnn2KYi5TZkTCr9NlMuF'), array('placeholder' => 'Cunsumer key')),
 				new Controls\Text('Consumer secret', array('default-value' => 'vxkz9T7QQWUmqnJbkf7Eg8aHvFOCdcSMVMZrfbUPdNbw7nuYx9'), array('placeholder' => 'Consumer secret')),
 				new Controls\Text('OAuth token', array('default-value' => '2717095358-aRUmevpNvioRb52xkFYls0Q7ldf9cIo2PjJzsqG'), array('placeholder' => 'Token')),
-				new Controls\Text('OAuth token secret', array('default-value' => 'woklRm4IAnMK5dEkXCAlSboirK4qlUmYcYNkRVddPIbl4'), array('placeholder' => 'Token secret'))
+				new Controls\Text('OAuth token secret', array('default-value' => 'woklRm4IAnMK5dEkXCAlSboirK4qlUmYcYNkRVddPIbl4'), array('placeholder' => 'Token secret')),
+				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-twitter'), array('placeholder' => 'Icon'))
 			)
 		);
 
@@ -270,13 +316,15 @@ class GCSocialWall{
 		$ccollection_post_type = new Controls\ControlsCollection(
 			array(						
 				new Controls\Select('Post type', array('values' => $post_types, 'description' => 'You can select your own post type')),
-				new Controls\Text('Include categories', array('description' => 'You need type category ids separated by commas. Like this: 1,2,3,4'))
+				new Controls\Text('Include categories', array('description' => 'You need type category ids separated by commas. Like this: 1,2,3,4'), array('placeholder' => 'Categories')),
+				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-wordpress'), array('placeholder' => 'Icon'))
 			)
 		);
 
 		$ccollection_youtube = new Controls\ControlsCollection(
 			array(		
-				new Controls\Text('Account', array('default-value' => 'vevo'), array('placeholder' => 'YouTube chanel'))
+				new Controls\Text('Account', array('default-value' => 'vevo'), array('placeholder' => 'YouTube chanel')),
+				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-youtube'), array('placeholder' => 'Icon'))
 			)
 		);
 
@@ -302,7 +350,48 @@ class GCSocialWall{
 				new Controls\Checkbox('Twitter', array('default-value' => 'on', 'label' => 'Show messages from Twiiter')),
 				new Controls\Checkbox('Post type', array('default-value' => 'on', 'label' => 'Show messages from WordPress Post type')),
 				new Controls\Checkbox('YouTube', array('default-value' => 'on', 'label' => 'Show messages from YouTube')),
-				new Controls\Checkbox('Vimeo', array('default-value' => 'on', 'label' => 'Show messages from Vimeo'))
+				new Controls\Checkbox('Vimeo', array('default-value' => 'on', 'label' => 'Show messages from Vimeo')),
+				new Controls\Checkbox('Instagram', array('default-value' => 'on', 'label' => 'Show images from Instagram')),
+			)
+		);
+
+		$ccollection_instagram = new Controls\ControlsCollection(
+			array(		
+				new Controls\Select(
+					'Search type',
+					array(
+						'values' => array(
+							array(Feeds\Instagram::POPULAR_ITEMS, 'Popular tems'),
+							array(Feeds\Instagram::SEARCH_BY_TAG, 'Search by tag'),
+							array(Feeds\Instagram::LOCATION_ID, 'Location id'),
+							array(Feeds\Instagram::USER_FEED, 'User feed')
+						),
+						'description' => 'Select a search option.'
+					)
+				),
+				new Controls\Text(
+					'Query',
+					array('description' => 'Search query.'),
+					array('placeholder' => 'Search query')
+				),
+				new Controls\Text(
+					'Client ID', 
+					array('default-value' => '1515b124cf42481db64cacfb96132345'), 
+					array('placeholder' => 'ID')
+				),
+				new Controls\Text(
+					'Client secret', 
+					array('default-value' => '0cd36d36a6d34f28a7dc978fbce46a35'), 
+					array('placeholder' => 'Secret')
+				),
+				new Controls\Text(
+					'Custom icon', 
+					array(
+						'description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 
+						'default-value' => 'fa-instagram'
+					), 
+					array('placeholder' => 'Icon')
+				)
 			)
 		);
 		
@@ -347,6 +436,14 @@ class GCSocialWall{
 			), 
 			$ccollection_youtube
 		);
+		$section_instagram   = new Admin\Section(
+			'Instagram', 
+			array(
+				'prefix'   => 'gc_ins_',
+				'tab_icon' => 'fa-instagram' 
+			), 
+			$ccollection_instagram
+		);
 		$section_global    = new Admin\Section(
 			'Global settings', 
 			array(
@@ -361,7 +458,8 @@ class GCSocialWall{
 			array(
 				$section_global, $section_facebook,
 				$section_twitter, $section_post_type,
-				$section_youtube, $section_vimeo
+				$section_youtube, $section_vimeo,
+				$section_instagram
 			)
 		);
 	}
@@ -380,7 +478,8 @@ class GCSocialWall{
 				'twitter'     => get_option('gc_gs_twitter'),
 				'post'        => get_option('gc_gs_post_type'),
 				'youtube'     => get_option('gc_gs_youtube'),
-				'vimeo'       => get_option('gc_gs_vimeo')
+				'vimeo'       => get_option('gc_gs_vimeo'),
+				'instagram'   => get_option('gc_gs_instagram')
 			)
 		);
 		
