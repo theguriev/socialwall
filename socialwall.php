@@ -4,7 +4,7 @@ Plugin Name: GC Social wall
 Plugin URI: http://wordpress.org/plugins/gc_social_wall/
 Description: This plugin helps to export your records from social networks in WordPress blog. To use it, simply insert this short code [gc_social_wall] in the right place.
 Author: Guriev Eugen
-Version: 1.02
+Version: 1.03
 Author URI: http://gurievcreative.com
 */
 

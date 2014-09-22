@@ -76,7 +76,7 @@ class Instagram extends Feed{
 					));
 			}	
 		}
-		return $messages;
+		return (array) $messages;
 	}
 
 	/**

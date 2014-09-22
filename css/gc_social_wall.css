@@ -13,6 +13,7 @@
 }
 
 .bricks nav ul.bricks-buttons li a{
+	border-radius: 50%;
 	color: white;
 	background: black;
 	display: block;
@@ -221,6 +222,24 @@
 .bricks nav ul.bricks-buttons li.vimeo a:hover{
 	color: #1ab7ea;
 	border-color: #1ab7ea;
+	background: transparent;	
+}
+
+.bricks .bricks-content .brick.instagram .brick-type{
+	background: #517fa4;
+}
+
+.bricks nav ul.bricks-buttons li.instagram.filter a:hover,
+.bricks nav ul.bricks-buttons li.instagram a{
+	background: #517fa4;
+	color: white;
+	border-color: transparent;
+}
+
+.bricks nav ul.bricks-buttons li.instagram.filter a,
+.bricks nav ul.bricks-buttons li.instagram a:hover{
+	color: #517fa4;
+	border-color: #517fa4;
 	background: transparent;	
 }
 

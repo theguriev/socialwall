@@ -8,7 +8,7 @@ class Agregator{
 	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
 	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
-	const CACHE_ON = false;	                                                 
+	const CACHE_ON = true;	                                                 
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -70,7 +70,6 @@ class Agregator{
 				)
 			);
 			$cache = $this->getCache($hash);
-
 			if($cache !== false)
 			{
 				$messages = $cache;
@@ -80,8 +79,6 @@ class Agregator{
 				$messages = (array) $feed->getMessages($count, $offset);
 				$this->setCache($hash, $messages);
 			}
-
-			
 			if(is_array($messages) AND count($messages))
 			{
 				foreach ($messages as &$msg) 
@@ -105,6 +102,8 @@ class Agregator{
 	 */
 	public function setCache($key, $val, $time = 36000)
 	{		
+		$val = is_array($val) ? serialize($val) : $val;
+		$val = base64_encode($val);
 		set_transient($key, $val, $time);
 	}
 
@@ -120,6 +119,16 @@ class Agregator{
 		if(self::CACHE_ON)
 		{
 			$cached = get_transient($key);
+			if($cached !== false)
+			{
+				$cached     = base64_decode($cached);
+				$cached_arr = unserialize($cached);
+
+				if(is_array($cached_arr))
+				{
+					$cached = $cached_arr;
+				}
+			} 
 		}
 		return false !== $cached ? $cached : false;
 	}

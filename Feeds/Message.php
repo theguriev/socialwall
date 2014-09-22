@@ -23,7 +23,7 @@ class Message{
 	// /_/ /_/ /_/\___/\__/_/ /_/\____/\__,_/____/  
 	public function __construct($text = '', $link = '', $date = '', $author = '', $picture = '', $type = '', $icon = '')
 	{
-		$this->text    = $text;
+		$this->text    = htmlentities(mb_convert_encoding($text, 'utf-8', mb_detect_encoding($text)));
 		$this->link    = $link;
 		$this->date    = $date;
 		$this->author  = $author;

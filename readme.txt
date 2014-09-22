@@ -1,9 +1,9 @@
 === GC Social Wall ===
 Contributors: Guriev Eugen
 Tags: facebook, twitter, youtube, social stream, social wall
-Requires at least: 1.02
+Requires at least: 1.03
 Tested up to: 4.0
-Stable tag: 1.02
+Stable tag: 1.03
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,9 +12,18 @@ This plugin helps to export your records from social networks in WordPress blog.
 == Description ==
 
 This plugin helps to export your records from social networks in WordPress blog.
+
 Demo link: http://site3.gurievcreative.com
 Support Link: http://gurievcreative.com/
 Support email: gurievcreative@gmail.com
+
+Supported social networks:
+* Twitter - user tweets.
+* Facebook - page posts.
+* WordPress - post types.
+* YouTube - user videos.
+* Vimeo - user videos.
+* Instagram - popular, search by tag, user photos, location id.
 
 How to setup GC Social Wall
 [youtube https://www.youtube.com/watch?v=DRvX3XhowIU]
@@ -81,3 +90,7 @@ How to change default icon to custom icon
 = 1.02 =
 * Added some fixes to css.
 * Added share buttons.
+
+= 1.03 =
+* Added instagram feed
+* Fixed some problems with cache
