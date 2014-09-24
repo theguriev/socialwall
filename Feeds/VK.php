@@ -2,7 +2,7 @@
 
 namespace Feeds;
 
-class Instagram extends Feed{
+class VK extends Feed{
 	//                          __              __      
 	//   _________  ____  _____/ /_____ _____  / /______
 	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
@@ -21,36 +21,25 @@ class Instagram extends Feed{
 	public function __construct($options = array())
 	{
 		parent::__construct($options);
-		$this->obj = new \sdk\Instagram\Instagram($this->options['client_id']);
+		$this->obj = new \sdk\VK\VkPhpSdk();
+
+		
+		$result = $this->obj->api('getProfiles', 
+			array(
+				'uids'   => '60840761',
+				'fields' => 'uid, first_name, last_name, nickname, screen_name, photo_big',
+			)
+		);
+		
+		echo '<pre>';
+		var_dump($result);
+		echo '</pre>';
 	}
 
 	public function getMessages($count = 5, $offset = 0)
 	{
-		$dataToConvert = array();
-		switch ($this->options['search_type']) 
-		{
-			case self::POPULAR_ITEMS:
-				$data = $this->obj->getPopularMedia();
-				break;
-			case self::SEARCH_BY_TAG:
-				$data = $this->obj->getTagMedia($this->options['query']);
-				break;
-			case self::LOCATION_ID:
-				$data = $this->obj->getLocationMedia($this->options['query']);
-				break;
-			case self::USER_FEED:
-				$data = $this->obj->getUserMedia($this->options['query']);
-				break;
-			
-			default:
-				$data = $this->obj->getPopularMedia();
-				break;
-		}
-		if(is_array($data->data))
-		{
-			$dataToConvert = array_slice($data->data, $offset, $count);
-		}
-		return $this->convert($dataToConvert);
+		
+		return NULL;
 	}
 
 	/**
@@ -68,7 +57,7 @@ class Instagram extends Feed{
 				array_push($messages, new Message(
 						$p->caption->text,
 						$p->link,
-						date('Y-m-d H:i:s', intval($p->created_time)),
+						$p->created_time,
 						$p->caption->from->full_name,
 						$p->images->standard_resolution->url,
 						$this->getName(),
@@ -85,7 +74,7 @@ class Instagram extends Feed{
 	 */
 	public static function getDefaultIcon()
 	{
-		return 'fa-instagram';
+		return 'fa-vk';
 	}
 
 	/**

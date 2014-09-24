@@ -1,9 +1,3 @@
-jQuery(window).load(function(){ 
-	// =========================================================
-	// MASONRY BRICS
-	// =========================================================
-	isotopeInit();
-});
 
 /**
  * Popup for share buttons
@@ -20,6 +14,7 @@ function sharePopup(obj, event)
 function layout()
 {
 	jQuery(gc_social_wall.container).masonry('layout');
+	window.timer = false;
 }
 
 /**
@@ -77,4 +72,49 @@ function hideBricksByFeed(bricks, feed)
 	bricks.find('.bricks-content .brick.' + feed).each(function(){
 		jQuery(this).hide();
 	});
+}
+
+/**
+ * Get messages
+ */
+function getMessages(feed)
+{
+	jQuery.ajax({
+        url: gc_social_wall.ajax_url,
+        type: 'POST', 
+        dataType: 'json',
+        async: false,
+        data: {
+            action:'getMessages',
+            feed: feed,
+            count: gc_social_wall.count
+        },
+        success:function(data) {
+            if(data.result)
+			{
+				var append_html = jQuery(data.html);
+				
+				jQuery(gc_social_wall.container).append(append_html);
+				jQuery(gc_social_wall.container).masonry('appended', append_html, true);
+				layout(); 
+				if(!window.timer)
+				{
+					window.timer = setTimeout(function() { layout() }, 1000);	
+				}
+			} 	
+        }
+    });
+}
+
+function sortPosts()
+{
+	var list = jQuery(gc_social_wall.container + ' .brick').toArray();
+	list.sort(function(a, b){
+		if(jQuery(a).data('time') > jQuery(b).data('time')) return -1;
+		return 1;
+	});
+
+	jQuery(list).appendTo(gc_social_wall.container);
+	jQuery(gc_social_wall.container).masonry('reloadItems');
+	layout();
 }

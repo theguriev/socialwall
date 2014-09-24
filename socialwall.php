@@ -4,7 +4,7 @@ Plugin Name: GC Social wall
 Plugin URI: http://wordpress.org/plugins/gc_social_wall/
 Description: This plugin helps to export your records from social networks in WordPress blog. To use it, simply insert this short code [gc_social_wall] in the right place.
 Author: Guriev Eugen
-Version: 1.03
+Version: 1.04
 Author URI: http://gurievcreative.com
 */
 
@@ -94,7 +94,9 @@ class GCSocialWall{
 		wp_enqueue_script('gc_social_wall', GCLIB_URL.'js/gc_social_wall.js', array('jquery'));
 		wp_localize_script('gc_social_wall', 'gc_social_wall', array(
 			'container'     => '.bricks-content',
-			'item_selector' => '.brick'
+			'item_selector' => '.brick',
+			'ajax_url'      => admin_url('admin-ajax.php'),
+			'count'         => $this->global_settings['count']
 			)
 		);
 	}
@@ -116,27 +118,31 @@ class GCSocialWall{
 	public function updateFeed()
 	{		
 		$feeds        = $this->agregator->getFeeds();
-		$msgs_by_time = $this->agregator->getMessages($this->global_settings['count']);
+		//$msgs_by_time = $this->agregator->getMessages($this->global_settings['count']);
 		$bricks       = '';
 		$feed_buttons = '';
+		$feed_to_show = '';
 
 		foreach ($feeds as $feed) 
 		{
 			if($this->global_settings[self::FIELD_FEEDS][$feed->getName()] == 'on')
-				$feed_buttons.= $this->wrapFeedButton($feed);
-		}
-
-		foreach ($msgs_by_time as $messages) 
-		{
-			if(is_array($messages))
 			{
-				foreach ($messages as $msg) 
-				{
-					if($this->global_settings[self::FIELD_FEEDS][$msg->type] == 'on')
-						$bricks.= $this->wrapBrick($msg);
-				}
+				$feed_to_show .= sprintf('getMessages("%s"); ', $feed->getName());
+				$feed_buttons .= $this->wrapFeedButton($feed);
 			}
 		}
+
+		// foreach ($msgs_by_time as $messages) 
+		// {
+		// 	if(is_array($messages))
+		// 	{
+		// 		foreach ($messages as $msg) 
+		// 		{
+		// 			if($this->global_settings[self::FIELD_FEEDS][$msg->type] == 'on')
+		// 				$bricks.= $this->wrapBrick($msg);
+		// 		}
+		// 	}
+		// }
 		?>
 		<div class="bricks">
 			<nav>
@@ -148,6 +154,13 @@ class GCSocialWall{
 				<?php echo $bricks; ?>
 			</div>
 		</div>
+		<script>
+			jQuery(document).ready(function(){
+				isotopeInit();
+				<?php echo $feed_to_show; ?>
+				sortPosts();
+			});
+		</script>
 		
 		<?php
 	}
@@ -170,7 +183,14 @@ class GCSocialWall{
 		);
 
 		$text = $obj->text == '' ? '' : sprintf('<section><div class="text">%s</div></section>', \__::cutText($obj->text, $this->global_settings['max_symbols'])); 
+
 		ob_start();
+
+		$maxLen = 200;
+		preg_match('/^.{0,'.$maxLen.'} .*?/ui', $obj->text, $match);
+		echo '<pre>';
+		var_dump($match);
+		echo '</pre>';
 		?>
 		<div class="brick <?php echo $obj->type; ?>">
 			<ul class="share-panel">
