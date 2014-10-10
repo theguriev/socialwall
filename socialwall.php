@@ -4,7 +4,7 @@ Plugin Name: GC Social wall
 Plugin URI: http://wordpress.org/plugins/gc_social_wall/
 Description: This plugin helps to export your records from social networks in WordPress blog. To use it, simply insert this short code [gc_social_wall] in the right place.
 Author: Guriev Eugen
-Version: 1.04
+Version: 1.11
 Author URI: http://gurievcreative.com
 */
 
@@ -17,10 +17,6 @@ class GCSocialWall{
 	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
 	const FIELD_FEEDS           = 'feeds';	
-	const SHARE_URL_FACEBOOK    = 'http://www.facebook.com/sharer.php?u=%s';
-	const SHARE_URL_TWITTER     = 'https://twitter.com/share?url=%s&via=%s';
-	const SHARE_URL_GOOGLE_PLUS = 'https://plus.google.com/share?url=%s';
-	const SHARE_URL_LINKEDIN    = 'http://www.linkedin.com/shareArticle?mini=true&url=%s';
 
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
@@ -42,21 +38,26 @@ class GCSocialWall{
 		$this->pageSettingsInit();	
 		$this->agregatorInit();	
 		$this->global_settings = $this->getGlobalSettingsOptions();
+
 		// =========================================================
 		// HOOKS
 		// =========================================================
 		add_action('wp_enqueue_scripts', array(&$this, 'scriptsAndStyles'));
 		add_action('admin_enqueue_scripts', array(&$this, 'adminScriptsAndStyles'));
 		add_action('admin_head', array(&$this, 'addTinyButton'));
-		// =========================================================
-		// SHORTCODE
-		// =========================================================
-		add_shortcode('gc_social_wall', array(&$this, 'updateFeed'));
+		
 	}
 
 	public function adminScriptsAndStyles()
 	{
 		wp_enqueue_style('default-styles', GCLIB_URL.'css/admin.css');
+
+		wp_enqueue_script('gc_social_wall', GCLIB_URL.'js/gc_social_wall_admin.js', array('jquery'));
+		wp_localize_script('gc_social_wall', 'gc_social_wall', array(
+			'ajax_url'      => admin_url('admin-ajax.php'),
+			'count'         => $this->global_settings['count']
+			)
+		);
 	}
 
 	public function addTinyButton()
@@ -96,7 +97,8 @@ class GCSocialWall{
 			'container'     => '.bricks-content',
 			'item_selector' => '.brick',
 			'ajax_url'      => admin_url('admin-ajax.php'),
-			'count'         => $this->global_settings['count']
+			'count'         => $this->global_settings['count'],
+			'async'         => $this->global_settings['asynchronous_loading'] 
 			)
 		);
 	}
@@ -113,180 +115,7 @@ class GCSocialWall{
 		$this->agregator->registerFeed(new Feeds\YouTube());	
 		$this->agregator->registerFeed(new Feeds\Vimeo());
 		$this->agregator->registerFeed(new Feeds\Instagram());
-	}
-
-	public function updateFeed()
-	{		
-		$feeds        = $this->agregator->getFeeds();
-		//$msgs_by_time = $this->agregator->getMessages($this->global_settings['count']);
-		$bricks       = '';
-		$feed_buttons = '';
-		$feed_to_show = '';
-
-		foreach ($feeds as $feed) 
-		{
-			if($this->global_settings[self::FIELD_FEEDS][$feed->getName()] == 'on')
-			{
-				$feed_to_show .= sprintf('getMessages("%s"); ', $feed->getName());
-				$feed_buttons .= $this->wrapFeedButton($feed);
-			}
-		}
-
-		// foreach ($msgs_by_time as $messages) 
-		// {
-		// 	if(is_array($messages))
-		// 	{
-		// 		foreach ($messages as $msg) 
-		// 		{
-		// 			if($this->global_settings[self::FIELD_FEEDS][$msg->type] == 'on')
-		// 				$bricks.= $this->wrapBrick($msg);
-		// 		}
-		// 	}
-		// }
-		?>
-		<div class="bricks">
-			<nav>
-				<ul class="bricks-buttons">
-					<?php echo $feed_buttons; ?>
-				</ul>
-			</nav>
-			<div class="bricks-content">
-				<?php echo $bricks; ?>
-			</div>
-		</div>
-		<script>
-			jQuery(document).ready(function(){
-				isotopeInit();
-				<?php echo $feed_to_show; ?>
-				sortPosts();
-			});
-		</script>
-		
-		<?php
-	}
-
-	/**
-	 * Wrap single brick to HTML code
-	 * @param  object $obj --- [Message] object - to wrap HTML code
-	 * @return string      --- HTML code
-	 */
-	private function wrapBrick($obj)
-	{
-		$twitter_account = Feeds\Twitter::getOptions();
-		$twitter_account = isset($twitter_account['account']) ? $twitter_account['account'] : '';
-
-		$img = $obj->picture != '' ? sprintf('<img src="%s">', $obj->picture) : '';
-		$link_text = sprintf(
-			'%s<br><small>posted %s</small>',
-			$obj->author,
-			$this->getElapsedTime(strtotime($obj->date))
-		);
-
-		$text = $obj->text == '' ? '' : sprintf('<section><div class="text">%s</div></section>', \__::cutText($obj->text, $this->global_settings['max_symbols'])); 
-
-		ob_start();
-
-		$maxLen = 200;
-		preg_match('/^.{0,'.$maxLen.'} .*?/ui', $obj->text, $match);
-		echo '<pre>';
-		var_dump($match);
-		echo '</pre>';
-		?>
-		<div class="brick <?php echo $obj->type; ?>">
-			<ul class="share-panel">
-				<li class="facebook">
-					<a href="<?php printf(self::SHARE_URL_FACEBOOK, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-facebook"></i>
-					</a>
-				</li>
-				<li class="twitter">
-					<a href="<?php printf(self::SHARE_URL_TWITTER, urlencode($obj->link), $twitter_account); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-twitter"></i>
-					</a>
-				</li>
-				<li class="google-plus">
-					<a href="<?php printf(self::SHARE_URL_GOOGLE_PLUS, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-google-plus"></i>
-					</a>
-				</li>
-				<li class="linkedin">
-					<a href="<?php printf(self::SHARE_URL_LINKEDIN, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-linkedin"></i>
-					</a>
-				</li>
-			</ul>
-			<header>
-				<?php echo $img; ?>
-			</header>
-			<?php echo $text; ?>
-			<footer>
-				<a href="<?php echo $obj->link; ?>" target="_blank">
-					<div class="brick-type">
-						<i class="fa <?php echo $obj->icon; ?>"></i>
-					</div>
-					<div class="txt">
-						<?php echo $link_text; ?>		
-					</div>
-				</a>
-			</footer>
-		</div>
-		<?php
-		$var = ob_get_contents();
-		ob_end_clean();
-		return $var;
-	}
-
-	/**
-	 * Wrap feed switcher button 
-	 * @param  object $feed --- [Feed] object
-	 * @return string       --- HTML code
-	 */
-	private function wrapFeedButton($feed)
-	{
-		return sprintf(
-			'<li class="%1$s"><a href="%1$s" onclick="filterToggle(event, this)"><i class="fa fa-2x %2$s"></i></a></li>', 
-			$feed->getName(), $feed->getIcon()
-		);
-	}
-
-	/**
-	 * Get elapsed time array
-	 * @return array --- elapsed time
-	 */
-	public function getElapsedTime($time)
-	{
-		$str   = '';
-		$items = array();
-		$time  = time() - $time;
-		$res   = array(
-			'year'   => 0,
-			'month'  => 0,
-			'day'    => 0,
-			'hour'   => 0,
-			'minute' => 0,
-			'second' => 0
-		);
-	    $tokens = array(
-	        31536000 => 'year',
-	        2592000  => 'month',        
-	        86400    => 'day',
-	        3600     => 'hour',
-	        60       => 'minute',
-	        1        => 'second');
-
-	    foreach ($tokens as $unit => $text) 
-	    {
-	        if ($time < $unit) continue;
-	        $res[$text] = floor($time / $unit);  
-	        $time = $time-($res[$text]*$unit);
-	    }	
-	    foreach ($res as $key => $value) 
-	    {
-	    	if(!intval($value)) continue;
-	    	$items[] = $value.' '.$key.' ';
-	    }    
-	    $items = array_slice($items, 0, 2);
-	    return implode(' ', $items).' ago';
+		$this->agregator->registerFeed(new Feeds\VK());
 	}
 
 	/**
@@ -306,27 +135,91 @@ class GCSocialWall{
 					'Custom icon', 
 					array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-vimeo-square'), 
 					array('placeholder' => 'Icon')
+				),
+				new Controls\Checkbox(
+					'Author panel', 
+					array('default-value' => 'on', 'label' => 'Show author panel')
+				),
+				new Controls\Checkbox(
+					'Counters', 
+					array('default-value' => 'on', 'label' => 'Show counters')
 				)
 			)
 		);
 
 		$ccollection_facebook = new Controls\ControlsCollection(
 			array(		
-				new Controls\Text('Account', array('default-value' => 'whitehouse'), array('placeholder' => 'Facebook page')),
-				new Controls\Text('APP ID', array('default-value' => '802383316448078'), array('placeholder' => 'Application ID')),
-				new Controls\Text('APP KEY', array('default-value' => '970b61246640d52ac45bfa8bf596e6d5'), array('placeholder' => 'Application key')),
-				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-facebook'), array('placeholder' => 'Icon'))
+				new Controls\Text(
+					'Account', 
+					array('default-value' => 'whitehouse'), 
+					array('placeholder' => 'Facebook page')
+				),
+				new Controls\Text(
+					'APP ID', 
+					array('default-value' => '802383316448078'), 
+					array('placeholder' => 'Application ID')
+				),
+				new Controls\Text(
+					'APP KEY', 
+					array('default-value' => '970b61246640d52ac45bfa8bf596e6d5'), 
+					array('placeholder' => 'Application key')
+				),
+				new Controls\Text(
+					'Custom icon', 
+					array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-facebook'), 
+					array('placeholder' => 'Icon')
+				),
+				new Controls\Checkbox(
+					'Author panel', 
+					array('default-value' => 'on', 'label' => 'Show author panel')
+				),
+				new Controls\Checkbox(
+					'Counters', 
+					array('default-value' => 'on', 'label' => 'Show counters')
+				)
 			)
 		);
 
 		$ccollection_twitter = new Controls\ControlsCollection(
 			array(		
-				new Controls\Text('Account', array('default-value' => 'whitehouse'), array('placeholder' => 'Twitter user')),
-				new Controls\Text('Consumer key', array('default-value' => 'aMY4Zsnn2KYi5TZkTCr9NlMuF'), array('placeholder' => 'Cunsumer key')),
-				new Controls\Text('Consumer secret', array('default-value' => 'vxkz9T7QQWUmqnJbkf7Eg8aHvFOCdcSMVMZrfbUPdNbw7nuYx9'), array('placeholder' => 'Consumer secret')),
-				new Controls\Text('OAuth token', array('default-value' => '2717095358-aRUmevpNvioRb52xkFYls0Q7ldf9cIo2PjJzsqG'), array('placeholder' => 'Token')),
-				new Controls\Text('OAuth token secret', array('default-value' => 'woklRm4IAnMK5dEkXCAlSboirK4qlUmYcYNkRVddPIbl4'), array('placeholder' => 'Token secret')),
-				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-twitter'), array('placeholder' => 'Icon'))
+				new Controls\Text(
+					'Account', 
+					array('default-value' => 'whitehouse'), 
+					array('placeholder' => 'Twitter user')
+				),
+				new Controls\Text(
+					'Consumer key', 
+					array('default-value' => 'aMY4Zsnn2KYi5TZkTCr9NlMuF'), 
+					array('placeholder' => 'Cunsumer key')
+				),
+				new Controls\Text(
+					'Consumer secret', 
+					array('default-value' => 'vxkz9T7QQWUmqnJbkf7Eg8aHvFOCdcSMVMZrfbUPdNbw7nuYx9'), 
+					array('placeholder' => 'Consumer secret')
+				),
+				new Controls\Text(
+					'OAuth token', 
+					array('default-value' => '2717095358-aRUmevpNvioRb52xkFYls0Q7ldf9cIo2PjJzsqG'), 
+					array('placeholder' => 'Token')
+				),
+				new Controls\Text(
+					'OAuth token secret', 
+					array('default-value' => 'woklRm4IAnMK5dEkXCAlSboirK4qlUmYcYNkRVddPIbl4'), 
+					array('placeholder' => 'Token secret')
+				),
+				new Controls\Text(
+					'Custom icon', 
+					array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-twitter'), 
+					array('placeholder' => 'Icon')
+				),
+				new Controls\Checkbox(
+					'Author panel', 
+					array('default-value' => 'on', 'label' => 'Show author panel')
+				),
+				new Controls\Checkbox(
+					'Counters', 
+					array('default-value' => 'on', 'label' => 'Show counters')
+				)
 			)
 		);
 
@@ -343,8 +236,24 @@ class GCSocialWall{
 
 		$ccollection_youtube = new Controls\ControlsCollection(
 			array(		
-				new Controls\Text('Account', array('default-value' => 'vevo'), array('placeholder' => 'YouTube chanel')),
-				new Controls\Text('Custom icon', array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-youtube'), array('placeholder' => 'Icon'))
+				new Controls\Text(
+					'Account', 
+					array('default-value' => 'vevo'), 
+					array('placeholder' => 'YouTube chanel')
+				),
+				new Controls\Text(
+					'Custom icon', 
+					array('description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 'default-value' => 'fa-youtube'), 
+					array('placeholder' => 'Icon')
+				),
+				new Controls\Checkbox(
+					'Author panel', 
+					array('default-value' => 'on', 'label' => 'Show author panel')
+				),
+				new Controls\Checkbox(
+					'Counters', 
+					array('default-value' => 'on', 'label' => 'Show counters')
+				)
 			)
 		);
 
@@ -366,12 +275,60 @@ class GCSocialWall{
 					), 
 					array('placeholder' => 'Limit messages per one feed.')
 				),
-				new Controls\Checkbox('Facebook', array('default-value' => 'on', 'label' => 'Show messages from Facebook')),
-				new Controls\Checkbox('Twitter', array('default-value' => 'on', 'label' => 'Show messages from Twiiter')),
-				new Controls\Checkbox('Post type', array('default-value' => 'on', 'label' => 'Show messages from WordPress Post type')),
-				new Controls\Checkbox('YouTube', array('default-value' => 'on', 'label' => 'Show messages from YouTube')),
-				new Controls\Checkbox('Vimeo', array('default-value' => 'on', 'label' => 'Show messages from Vimeo')),
-				new Controls\Checkbox('Instagram', array('default-value' => 'on', 'label' => 'Show images from Instagram')),
+				new Controls\Select(
+					'Asynchronous loading',
+					array(
+						'values' => array('true', 'fasle'),
+						'default-value' => 'true',
+						'description' => 'Asynchronous feeds loading'
+					)
+				),
+				new Controls\Checkbox(
+					'Facebook', 
+					array('default-value' => 'on', 'label' => 'Show messages from Facebook')
+				),
+				new Controls\Checkbox(
+					'Twitter', 
+					array('default-value' => 'on', 'label' => 'Show messages from Twiiter')
+				),
+				new Controls\Checkbox(
+					'Post type', 
+					array('default-value' => 'on', 'label' => 'Show messages from WordPress Post type')
+				),
+				new Controls\Checkbox(
+					'YouTube', 
+					array('default-value' => 'on', 'label' => 'Show messages from YouTube')
+				),
+				new Controls\Checkbox(
+					'Vimeo', 
+					array('default-value' => 'on', 'label' => 'Show messages from Vimeo')
+				),
+				new Controls\Checkbox(
+					'Instagram', 
+					array('default-value' => 'on', 'label' => 'Show images from Instagram')
+				),
+				new Controls\Checkbox(
+					'VK', 
+					array('default-value' => 'on', 'label' => 'Show wall posts from vkontakte')
+				),
+				new Controls\Text(
+					'Clean cache', 
+					array(
+						'default-value' => 'Clean',
+						'description'   => 'Clean your feed cache',
+						'name'          => 'clean_cache_btn'
+					),
+					array(
+						'type'          => 'button',
+						'onclick'       => 'cleanCache()',
+						'class'         => 'button',
+						'value'         => 'Clean'
+					)
+				),
+				new Controls\Checkbox(
+					'Hide buttons', 
+					array('default-value' => '', 'label' => 'Hide all navigate buttons')
+				),
 			)
 		);
 
@@ -400,17 +357,46 @@ class GCSocialWall{
 					array('placeholder' => 'ID')
 				),
 				new Controls\Text(
-					'Client secret', 
-					array('default-value' => '0cd36d36a6d34f28a7dc978fbce46a35'), 
-					array('placeholder' => 'Secret')
-				),
-				new Controls\Text(
 					'Custom icon', 
 					array(
 						'description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 
 						'default-value' => 'fa-instagram'
 					), 
 					array('placeholder' => 'Icon')
+				),
+				new Controls\Checkbox(
+					'Author panel', 
+					array('default-value' => 'on', 'label' => 'Show author panel')
+				),
+				new Controls\Checkbox(
+					'Counters', 
+					array('default-value' => 'on', 'label' => 'Show counters')
+				)
+			)
+		);
+
+		$ccollection_vk = new Controls\ControlsCollection(
+			array(		
+				new Controls\Text(
+					'Account', 
+					array('default-value' => 'id236993150'), 
+					array('placeholder' => 'vkontakte user id or user domain')
+				),
+				new Controls\Text(
+					'Custom icon', 
+					array(
+						'description' => 'You can select the desired icon from here <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">Font Awesome</a> and paste in the field or register your own icon in "YourTheme/style.css".', 
+						'default-value' => 'fa-vk'
+					), 
+					array('placeholder' => 'Icon')
+				),
+				new Controls\Checkbox(
+					'Author panel', 
+					array('default-value' => 'on', 'label' => 'Show author panel')
+				),
+				new Controls\Checkbox(
+					'Counters', 
+					array('default-value' => 'on', 'label' => 'Show counters')
 				)
 			)
 		);
@@ -464,6 +450,16 @@ class GCSocialWall{
 			), 
 			$ccollection_instagram
 		);
+
+		$section_vk   = new Admin\Section(
+			'VK', 
+			array(
+				'prefix'   => 'gc_vk_',
+				'tab_icon' => 'fa-vk' 
+			), 
+			$ccollection_vk
+		);
+
 		$section_global    = new Admin\Section(
 			'Global settings', 
 			array(
@@ -479,7 +475,7 @@ class GCSocialWall{
 				$section_global, $section_facebook,
 				$section_twitter, $section_post_type,
 				$section_youtube, $section_vimeo,
-				$section_instagram
+				$section_instagram, $section_vk
 			)
 		);
 	}
@@ -488,18 +484,21 @@ class GCSocialWall{
 	 * Get Global setting
 	 * @return array --- facebook options
 	 */
-	public function getGlobalSettingsOptions()
+	public static function getGlobalSettingsOptions()
 	{
 		return array(
-			'max_symbols' => (int) get_option('gc_gs_max_symbols'),
-			'count'       => (int) get_option('gc_gs_messages_per_feed'),
-			self::FIELD_FEEDS => array(
+			'max_symbols'          => (int) get_option('gc_gs_max_symbols'),
+			'count'                => (int) get_option('gc_gs_messages_per_feed'),
+			'asynchronous_loading' => get_option('gc_gs_asynchronous_loading'),
+			'hide_buttons'         => get_option('gc_gs_hide_buttons' ),
+			self::FIELD_FEEDS      => array(
 				'facebook'    => get_option('gc_gs_facebook'),
 				'twitter'     => get_option('gc_gs_twitter'),
 				'post'        => get_option('gc_gs_post_type'),
 				'youtube'     => get_option('gc_gs_youtube'),
 				'vimeo'       => get_option('gc_gs_vimeo'),
-				'instagram'   => get_option('gc_gs_instagram')
+				'instagram'   => get_option('gc_gs_instagram'),
+				'vk'          => get_option('gc_gs_vk')
 			)
 		);
 		

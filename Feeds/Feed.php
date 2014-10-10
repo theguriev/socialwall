@@ -45,7 +45,7 @@ abstract class Feed{
 		$options['icon'] = $this->getIcon(); // Will be update after changing icon
 
 		$options = \__::joinArray($options);
-
+		
 		return $this->formatCacheKey($options);
 	}
 
@@ -70,6 +70,24 @@ abstract class Feed{
 		$icon = (string) $options['icon'];
 		if(strlen($icon)) return $icon;
 		return static::getDefaultIcon();
+	}
+
+	/**
+	 * Show author panel or no
+	 * @return boolean --- true if show | false if no
+	 */
+	public function showAuthorPanel()
+	{
+		return $this->options['author_panel'] == 'on';
+	}
+
+	/**
+	 * Show counters or no
+	 * @return boolean --- true if show | false if no
+	 */
+	public function showCounters()
+	{
+		return $this->options['counters'] == 'on';
 	}
 
 	/**

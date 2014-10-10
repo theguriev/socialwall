@@ -8,10 +8,15 @@ class Instagram extends Feed{
 	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
 	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
-	const POPULAR_ITEMS = 0;
-	const SEARCH_BY_TAG = 1;
-	const LOCATION_ID   = 2;
-	const USER_FEED     = 3;
+	const POPULAR_ITEMS     = 0;
+	const SEARCH_BY_TAG     = 1;
+	const LOCATION_ID       = 2;
+	const USER_FEED         = 3;
+	const POPULAR_ITEMS_URL = 'https://api.instagram.com/v1/media/popular?client_id=%s&count=%s';
+	const SEARCH_BY_TAG_URL = 'https://api.instagram.com/v1/tags/%s/media/recent?client_id=%s&count=%s';
+	const LOCATION_ID_URL   = 'https://api.instagram.com/v1/locations/%s/media/recent?client_id=%s&count=%s';
+	const USER_FEED_URL     = 'https://api.instagram.com/v1/users/%s/media/recent?client_id=%s&count=%s';
+	const AUTHOR_URL        = 'http://instagram.com/%s';      
 
 	//                    __  __              __    
 	//    ____ ___  ___  / /_/ /_  ____  ____/ /____
@@ -21,36 +26,50 @@ class Instagram extends Feed{
 	public function __construct($options = array())
 	{
 		parent::__construct($options);
-		$this->obj = new \sdk\Instagram\Instagram($this->options['client_id']);
 	}
 
 	public function getMessages($count = 5, $offset = 0)
 	{
-		$dataToConvert = array();
-		switch ($this->options['search_type']) 
+		$URL  = $this->getURL($this->options['search_type'], $this->options['query'], $count);
+		$data = \__::fileGetContentsCurl($URL);
+		$data = json_decode($data);
+
+		if($data)
 		{
-			case self::POPULAR_ITEMS:
-				$data = $this->obj->getPopularMedia();
-				break;
-			case self::SEARCH_BY_TAG:
-				$data = $this->obj->getTagMedia($this->options['query']);
-				break;
-			case self::LOCATION_ID:
-				$data = $this->obj->getLocationMedia($this->options['query']);
-				break;
-			case self::USER_FEED:
-				$data = $this->obj->getUserMedia($this->options['query']);
-				break;
-			
-			default:
-				$data = $this->obj->getPopularMedia();
-				break;
+			return $this->convert($data->data);	
 		}
-		if(is_array($data->data))
+		return NULL;
+	}
+
+	/**
+	 * Get request URL
+	 * @param  integer $type  --- request type
+	 * @param  string  $query --- query
+	 * @param  integer $count --- limit items
+	 * @return string --- URL 
+	 */
+	public function getURL($type = 0, $query = '', $count = 5)
+	{
+		$client_ID = $this->options['client_id'];
+		$types     = array(
+			self::SEARCH_BY_TAG => self::SEARCH_BY_TAG_URL,
+			self::LOCATION_ID => self::LOCATION_ID_URL,
+			self::USER_FEED => self::USER_FEED_URL
+		);
+
+		if($type)
 		{
-			$dataToConvert = array_slice($data->data, $offset, $count);
+			return sprintf(
+				$types[$type],
+				$query,
+				$client_ID,
+				$count
+			);
 		}
-		return $this->convert($dataToConvert);
+		return sprintf(
+			self::POPULAR_ITEMS_URL,
+			$client_ID, $count
+		);
 	}
 
 	/**
@@ -63,20 +82,88 @@ class Instagram extends Feed{
 		$messages = array();			
 		if(is_array($arr) AND count($arr))
 		{
-			foreach ($arr as $p) 
-			{		
+			foreach ($arr as $el) 
+			{	
+				// ==============================================================
+				// Agregator
+				// ==============================================================
+				$agregator = new \Feeds\Panels\PanelAgregator(
+					array(
+						'middle' => array($this->getAuthorPanel($el)),
+						'below_text' => array($this->getCounters($el))
+					)
+				);
+
 				array_push($messages, new Message(
-						$p->caption->text,
-						$p->link,
-						date('Y-m-d H:i:s', intval($p->created_time)),
-						$p->caption->from->full_name,
-						$p->images->standard_resolution->url,
+						$el->caption->text,
+						$el->link,
+						date('Y-m-d H:i:s', intval($el->created_time)),
+						$el->caption->from->full_name,
+						$el->images->standard_resolution->url,
 						$this->getName(),
-						$this->getIcon()
+						$this->getIcon(),
+						$agregator,
+						''
 					));
 			}	
 		}
 		return (array) $messages;
+	}
+
+	/**
+	 * Get author PanelLink
+	 * @param  object $el --- author object
+	 * @return mixed --- PanelLink if succes | null if not
+	 */
+	private function getAuthorPanel($el)
+	{
+		if(!$this->showAuthorPanel()) return null;
+		$author_link  = sprintf(self::AUTHOR_URL, $el->user->username);
+		return new \Feeds\Panels\PanelLink(
+			array(
+				sprintf(
+					'<img width="%s" class="%s" alt="%s" src="%s">',
+					30,
+					'circle', 
+					$el->user->full_name,
+					$el->user->profile_picture
+				),
+				sprintf(
+					'<div class="txt"><b class="title">%s</b><br><small>%s</small></div>',
+					$el->user->full_name,
+					$el->user->website
+				)
+			), 
+			'panel', 
+			$author_link
+		);
+	}
+
+	/**
+	 * Get counter Panel
+	 * @param  object $el --- post object
+	 * @return mixed --- Panel if success | null if not
+	 */
+	private function getCounters($el)
+	{
+		if(!$this->showCounters()) return null;
+		return new \Feeds\Panels\Panel(
+			array(
+				'<ul>',
+				sprintf(
+					'<li><i class="fa %s"></i> %s</li>',
+					'fa-heart',
+					intval($el->likes->count)
+				),
+				sprintf(
+					'<li><i class="fa %s"></i> %s</li>',
+					'fa-comments',
+					intval($el->comments->count)
+				),
+				'</ul>'
+			),
+			'counts'
+		);
 	}
 
 	/**
@@ -98,7 +185,8 @@ class Instagram extends Feed{
 			'search_type'   => intval(get_option('gc_ins_search_type')),
 			'query'         => (string) get_option('gc_ins_query'),
 			'client_id'     => (string) get_option('gc_ins_client_id'),
-			'client_secret' => (string) get_option('gc_ins_client_secret'),
+			'author_panel'  => (string) get_option('gc_ins_author_panel'),
+			'counters'      => (string) get_option('gc_ins_counters'),
 			'icon'          => (string) get_option('gc_ins_custom_icon')
 		);
 	}

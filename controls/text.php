@@ -27,7 +27,7 @@ class Text extends Control{
 	 */
 	public function getHTML($value = null)
 	{		
-		$this->setValue($value);
+		if($this->meta_visible['type'] != 'button') $this->setValue($value);
 		$control = sprintf('<input %s />', \__::joinArray($this->getMetaVisible()));
 		return $this->getTitleHTML().$control.$this->getDescriptionHTML();
 	}

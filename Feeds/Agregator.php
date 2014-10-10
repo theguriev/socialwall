@@ -2,17 +2,7 @@
 
 namespace Feeds;
 
-class Agregator{
-	//                          __              __      
-	//   _________  ____  _____/ /_____ _____  / /______
-	//  / ___/ __ \/ __ \/ ___/ __/ __ `/ __ \/ __/ ___/
-	// / /__/ /_/ / / / (__  ) /_/ /_/ / / / / /_(__  ) 
-	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
-	const CACHE_ON = true;	
-	const SHARE_URL_FACEBOOK    = 'http://www.facebook.com/sharer.php?u=%s';
-	const SHARE_URL_TWITTER     = 'https://twitter.com/share?url=%s&via=%s';
-	const SHARE_URL_GOOGLE_PLUS = 'https://plus.google.com/share?url=%s';
-	const SHARE_URL_LINKEDIN    = 'http://www.linkedin.com/shareArticle?mini=true&url=%s';                                                 
+class Agregator{                                 
 	//                                       __  _          
 	//     ____  _________  ____  ___  _____/ /_(_)__  _____
 	//    / __ \/ ___/ __ \/ __ \/ _ \/ ___/ __/ / _ \/ ___/
@@ -29,8 +19,17 @@ class Agregator{
 	{
 		$this->feeds = $feeds;
 
-		add_action('wp_ajax_getMessages', array(&$this, 'getMessage'));
-		add_action('wp_ajax_nopriv_getMessages', array(&$this, 'getMessage'));
+		// ==============================================================
+		// AJAX methods initialization
+		// ==============================================================
+		add_action('wp_ajax_getMessages', array(&$this, 'getMessages'));
+		add_action('wp_ajax_nopriv_getMessages', array(&$this, 'getMessages'));
+		add_action('wp_ajax_cleanCache', array(&$this, 'cleanCache'));
+		add_action('wp_ajax_nopriv_cleanCache', array(&$this, 'cleanCache'));
+		// =========================================================
+		// SHORTCODE
+		// =========================================================
+		add_shortcode('gc_social_wall', array(&$this, 'displayFeeds'));
 	}
 
 	/**
@@ -60,249 +59,139 @@ class Agregator{
 		return (array) $this->feeds;
 	}
 
-	/**
-	 * Get all posts
-	 * @param  integer $count  --- msg per feed
-	 * @param  integer $offset --- offset msg
-	 * @return array           --- all feeds with msg
-	 */
-	public function getMessages($count = 5, $offset = 0)
-	{		
-		foreach ($this->feeds as $key => $feed) 
-		{
-			$hash  = $feed->getHashRequestOptions(
-				array(
-					'count'  => $count,
-					'offset' => $offset
-				)
-			);
-			$cache = $this->getCache($hash);
-			if($cache !== false)
-			{
-				$messages = $cache;
-			}
-			else
-			{	
-				$messages = (array) $feed->getMessages($count, $offset);
-				$this->setCache($hash, $messages);
-			}
-			if(is_array($messages) AND count($messages))
-			{
-				foreach ($messages as &$msg) 
-				{
-					$time           = strtotime($msg->date);
-					$posts[$time][] = $msg;
-				}
-			}
-		}
-		krsort($posts);
-		var_dump($posts);
-		die();
-		return $posts;
-	}
-
-	public function getMessage()
-	{
-		$count    = 10;
-		$offset   = 0;
-		$messages = array();
-		$data     = array();
-		if(isset($_POST['feed']) AND strlen($_POST['feed']))
-		{
-			$count = intval($_POST['count']);
-			$feed  = $_POST['feed'];
-			if(isset($this->feeds[$feed]))
-			{
-				$hash  = $this->feeds[$feed]->getHashRequestOptions(
-					array(
-						'count'  => $count,
-						'offset' => $offset
-					)
-				);
-				$cache = $this->getCache($hash);
-				if($cache !== false)
-				{
-					$messages = $cache;
-				}
-				else
-				{	
-					$messages = (array) $this->feeds[$feed]->getMessages($count, $offset);
-					$this->setCache($hash, $messages);
-				}
-
-				foreach ($messages as $msg) 
-				{
-					$data['html'] .= $this->wrapBrick($msg);
-				}
-				$data['result'] = true;
-				echo json_encode($data);
-			}
-		}
-		die();
-	}
-
-	private function sortMessagesByTime($messages)
-	{
-		if(!is_array($messages) AND !count($messages)) return $messages;
-		if(is_array($messages) AND count($messages))
-		{
-			foreach ($messages as &$msg) 
-			{
-				$time           = strtotime($msg->date);
-				$posts[$time][] = $msg;
-			}
-		}
-		krsort($posts);
-		return $posts;
-	}
 
 	/**
-	 * Wrap single brick to HTML code
-	 * @param  object $obj --- [Message] object - to wrap HTML code
-	 * @return string      --- HTML code
+	 * Wrap feed switcher button 
+	 * @param  object $feed --- [Feed] object
+	 * @return string       --- HTML code
 	 */
-	private function wrapBrick($obj)
+	private function wrapFeedButton($feed)
 	{
-		$twitter_account = Twitter::getOptions();
-		$twitter_account = isset($twitter_account['account']) ? $twitter_account['account'] : '';
-
-		$img = $obj->picture != '' ? sprintf('<img src="%s">', $obj->picture) : '';
-		$link_text = sprintf(
-			'%s<br><small>posted %s</small>',
-			$obj->author,
-			$this->getElapsedTime(strtotime($obj->date))
+		return sprintf(
+			'<li class="%1$s"><a href="%1$s" onclick="filterToggle(event, this)"><i class="fa fa-2x %2$s"></i></a></li>', 
+			$feed->getName(), $feed->getIcon()
 		);
+	}
 
-		$text = $obj->text == '' ? '' : sprintf('<section><div class="text">%s</div></section>', \__::cutText($obj->text, 200)); 
+	/**
+	 * Wrap feed navigate buttons
+	 * @param  string $hide_buttons --- social wall option
+	 * @param  string $buttons --- buttons HTML code
+	 * @return string --- buttons wrapped HTML code
+	 */
+	private function wrapFeedButtons($hide_buttons, $buttons)
+	{
+		if($hide_buttons == 'on') return '';
+		return sprintf('<nav><ul class="bricks-buttons">%s</ul></nav>', $buttons);
+	}
+
+	/**
+	 * Display all feeds with buttons panel
+	 * @return string --- HTML code
+	 */
+	public function displayFeeds()
+	{		
+		$feeds           = $this->getFeeds();
+		$bricks          = '';
+		$feed_buttons    = '';
+		$feed_to_show    = '';
+		$global_settings = \GCSocialWall::getGlobalSettingsOptions();
+
+		foreach ($feeds as $feed) 
+		{
+			if($global_settings[\GCSocialWall::FIELD_FEEDS][$feed->getName()] == 'on')
+			{
+				$feed_to_show .= sprintf('getMessages("%s"); ', $feed->getName());
+				$feed_buttons .= $this->wrapFeedButton($feed);
+			}
+		}
 		ob_start();
-
 		?>
-		<div class="brick <?php echo $obj->type; ?>" data-time="<?php echo strtotime($obj->date); ?>" data-time-no="<?php echo $obj->date; ?>">
-			<?php
-			echo '<pre>';
-			var_dump($obj, mb_strlen($obj->text), $this->global_settings);
-			echo '</pre>';
-			?>
-			<ul class="share-panel">
-				<li class="facebook">
-					<a href="<?php printf(self::SHARE_URL_FACEBOOK, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-facebook"></i>
-					</a>
-				</li>
-				<li class="twitter">
-					<a href="<?php printf(self::SHARE_URL_TWITTER, urlencode($obj->link), $twitter_account); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-twitter"></i>
-					</a>
-				</li>
-				<li class="google-plus">
-					<a href="<?php printf(self::SHARE_URL_GOOGLE_PLUS, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-google-plus"></i>
-					</a>
-				</li>
-				<li class="linkedin">
-					<a href="<?php printf(self::SHARE_URL_LINKEDIN, urlencode($obj->link)); ?>" onclick="sharePopup(this, event)">
-						<i class="fa fa-linkedin"></i>
-					</a>
-				</li>
-			</ul>
-			<header>
-				<?php echo $img; ?>
-			</header>
-			<?php echo $text; ?>
-			<footer>
-				<a href="<?php echo $obj->link; ?>" target="_blank">
-					<div class="brick-type">
-						<i class="fa <?php echo $obj->icon; ?>"></i>
-					</div>
-					<div class="txt">
-						<?php echo $link_text; ?>		
-					</div>
-				</a>
-			</footer>
+		<div class="bricks">
+			<?php echo $this->wrapFeedButtons($global_settings['hide_buttons'], $feed_buttons); ?>
+			<div class="bricks-content">
+				<?php echo $bricks; ?>
+			</div>
 		</div>
+		<script>
+			jQuery(document).ready(function(){
+				isotopeInit();
+				<?php echo $feed_to_show; ?>
+				setTimeout(sortPosts, 3000);
+				setTimeout(sortPosts, 6000);
+				setTimeout(sortPosts, 16000);
+			});
+		</script>
 		<?php
+		
 		$var = ob_get_contents();
 		ob_end_clean();
 		return $var;
 	}
 
 	/**
-	 * Get elapsed time array
-	 * @return array --- elapsed time
+	 * Get messages from Feed. [AJAX]
 	 */
-	public function getElapsedTime($time)
+	public function getMessages()
 	{
-		$str   = '';
-		$items = array();
-		$time  = time() - $time;
-		$res   = array(
-			'year'   => 0,
-			'month'  => 0,
-			'day'    => 0,
-			'hour'   => 0,
-			'minute' => 0,
-			'second' => 0
-		);
-	    $tokens = array(
-	        31536000 => 'year',
-	        2592000  => 'month',        
-	        86400    => 'day',
-	        3600     => 'hour',
-	        60       => 'minute',
-	        1        => 'second');
+		$count    = 10;
+		$offset   = 0;
+		$messages = array();
+		$data     = array();
 
-	    foreach ($tokens as $unit => $text) 
-	    {
-	        if ($time < $unit) continue;
-	        $res[$text] = floor($time / $unit);  
-	        $time = $time-($res[$text]*$unit);
-	    }	
-	    foreach ($res as $key => $value) 
-	    {
-	    	if(!intval($value)) continue;
-	    	$items[] = $value.' '.$key.' ';
-	    }    
-	    $items = array_slice($items, 0, 2);
-	    return implode(' ', $items).' ago';
-	}
-
-	/**
-	 * Set Cache
-	 * @param string  $key    
-	 * @param string  $val    
-	 * @param integer $time   
-	 * @param string  $prefix 
-	 */
-	public function setCache($key, $val, $time = 36000)
-	{		
-		$val = is_array($val) ? serialize($val) : $val;
-		$val = base64_encode($val);
-		set_transient($key, $val, $time);
-	}
-
-	/**
-	 * Get Cache
-	 * @param  string $key    
-	 * @param  string $prefix 
-	 * @return mixed
-	 */
-	public function getCache($key)
-	{	
-		$cached = false;	
-		if(self::CACHE_ON)
+		if(isset($_POST['feed']) AND strlen($_POST['feed']))
 		{
-			$cached = get_transient($key);
-			if($cached !== false)
+			$count = intval($_POST['count']);
+			$feed  = $_POST['feed'];
+			if(isset($this->feeds[$feed]))
 			{
-				$cached     = base64_decode($cached);
-				$cached_arr = unserialize($cached);
+				$f = $this->feeds[$feed];
+				$hash  = $f->getHashRequestOptions(
+					array(
+						'count'  => $count,
+						'offset' => $offset
+					)
+				);
+				
+				$messages = \__::getSetCache($hash, function() use($count, $offset, $f) { return (array) $f->getMessages($count, $offset); });
 
-				if(is_array($cached_arr))
+				foreach ($messages as $msg) 
 				{
-					$cached = $cached_arr;
+					$data['html'] .= $msg->getHTML();
 				}
-			} 
+				$data['html'] = @mb_convert_encoding($data['html'], 'utf-8', mb_detect_encoding($data['html']));
+				$data['result'] = true;
+				$data['hash'] = $hash;
+				echo json_encode($data);
+			}
 		}
-		return false !== $cached ? $cached : false;
+		die();
 	}
+
+	/**
+	 * Clean all cache
+	 */
+	public function cleanCache()
+	{
+		$arr = array();
+
+		foreach ($this->feeds as $f) 
+		{
+			$count = intval($_POST['count']);
+			$hash  = $f->getHashRequestOptions(
+				array(
+					'count'  => $count,
+					'offset' => 0
+				)
+			);
+			
+			$arr[] = array(
+				delete_transient($hash),
+				$hash
+			);
+		}
+		echo json_encode($arr);
+		die();
+	}
+
 }

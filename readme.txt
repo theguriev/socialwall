@@ -1,9 +1,9 @@
 === GC Social Wall ===
 Contributors: Guriev Eugen
 Tags: facebook, twitter, youtube, social stream, social wall
-Requires at least: 1.04
+Requires at least: 1.11
 Tested up to: 4.0
-Stable tag: 1.04
+Stable tag: 1.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,7 @@ Support email: gurievcreative@gmail.com
 *   YouTube - user videos.
 *   Vimeo - user videos.
 *   Instagram - popular, search by tag, user photos, location id.
+*   VK - user wall posts.
 
 How to setup GC Social Wall
 [youtube https://www.youtube.com/watch?v=DRvX3XhowIU]
@@ -94,8 +95,47 @@ How to change default icon to custom icon
 * Added share buttons.
 
 = 1.03 =
-* Added instagram feed
-* Fixed some problems with cache
+* Added instagram feed.
+* Fixed some problems with cache.
 
 = 1.04 =
-* Added asynchronous loading posts
+* Added asynchronous loading posts.
+
+= 1.05 =
+* Added vk social network.
+* Fix some bugs with asynchronous loading.
+
+= 1.06 =
+* Added retweet count and favorites count to Twitter posts.
+* Added author panel to Twitter posts.
+* Added shares, likes and comments counts to Facebook posts.
+* Added author panel to Facebook posts.
+* Remove Facebook SDK.
+* Added likes, comments and resposts counts to VK posts.
+* Added author panel to VK posts.
+* Remove VK SDK.
+* Added likes and comments counts to Instagram posts.
+* Added author panel to Instagram posts.
+* Remove Instagram SDK.
+* Added favorite, views, likes, dislikes and comments counts to YouTube posts.
+* Added author panel to YouTube posts.
+* Added likes, comments and views counts to Vimeo posts.
+* Added hashtags ling wrapper to Twitter posts.
+* Added hashtags ling wrapper to Facebook posts.
+
+= 1.07 =
+* Added the ability to load asynchronously.
+
+= 1.08 =
+* Fixed some problems with max symbols.
+
+= 1.09 =
+* Fixed facebook empty posts problems.
+* Added taget="_top" to wordpress type posts. Thank Stéphane :-)
+* Added "Clear cache" button
+
+= 1.10 =
+* Added "Hide buttons" switcher. Thanks Jaqueline :-)
+
+= 1.11 =
+* Fixed some problems with facebook limit.

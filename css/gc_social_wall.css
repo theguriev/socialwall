@@ -77,7 +77,7 @@
 	left: 10px;
 	position: absolute;
 	text-align: center;
-	top: 25px;
+	top: 15px;
 	transition: all 0.3s ease-out 0.1s;
 	width: 30px;
 }
@@ -89,6 +89,7 @@
 
 .bricks .bricks-content .brick header{
 	float: left;
+	width: 100%;
 }
 
 .bricks .bricks-content .brick header img{
@@ -102,9 +103,12 @@
 	overflow: hidden;
 }
 
+.bricks .bricks-content .brick section a{
+	text-decoration: none;
+}
+
 .brick footer{
 	text-align: left;
-	border-top: 1px solid #e7e7e7;
 	position: relative;
 	float: left;
 	width: 100%;
@@ -115,16 +119,22 @@
 	font-weight: bold;
 	padding: 15px 15px 15px 50px;
 	text-decoration: none;
+	position: relative;
+	border-top: 1px solid #e7e7e7;
 }
 
+.brick a.panel:hover,
 .brick footer a:hover{
 	background: #f1f1f1;
 }
 
+.brick .panel .txt,
 .brick footer a .txt{
 	color: #222;
+	line-height: 15px;
 }
 
+.brick .panel .txt small,
 .brick footer a .txt small{
 	color: gray;
 	font-weight: normal;
@@ -132,6 +142,45 @@
 
 .brick footer a:visited{
 	text-decoration: underline;
+}
+
+.brick .panel{
+	border-top: 1px solid #e7e7e7;
+	display: block;
+	overflow: hidden;
+	padding: 15px 15px 15px 10px;
+	position: relative;
+	text-decoration: none;
+}
+
+.brick .counts{
+	display: block;
+	color: #e7e7e7;
+}
+
+.brick .counts ul{
+	margin: 0;
+}
+
+.brick .counts ul li{
+	display: inline-block;
+	font-size: 10px;
+	margin: 0 5px 0 0;
+}
+
+.brick .counts ul li i{
+	font-size: 12px;
+}
+
+.brick .panel img.circle{
+	border-radius: 50%;
+	box-shadow: none;
+	float: left;
+	margin: 0 10px 0 0;
+}
+
+.brick .panel .text{
+	line-height: 15px;
 }
 
 /*COLORS*/
@@ -240,6 +289,25 @@
 .bricks nav ul.bricks-buttons li.instagram a:hover{
 	color: #517fa4;
 	border-color: #517fa4;
+	background: transparent;	
+}
+
+
+.bricks .bricks-content .brick.vk .brick-type{
+	background: #45668e;
+}
+
+.bricks nav ul.bricks-buttons li.vk.filter a:hover,
+.bricks nav ul.bricks-buttons li.vk a{
+	background: #45668e;
+	color: white;
+	border-color: transparent;
+}
+
+.bricks nav ul.bricks-buttons li.vk.filter a,
+.bricks nav ul.bricks-buttons li.vk a:hover{
+	color: #45668e;
+	border-color: #45668e;
 	background: transparent;	
 }
 

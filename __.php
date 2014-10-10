@@ -12,6 +12,7 @@ class __{
 	// \___/\____/_/ /_/____/\__/\__,_/_/ /_/\__/____/  
 	const FONT_AWESOME_CSS = '//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css';	
 	const BASE_CSS         = '/css/base.css';
+	const CACHE_ON 		   = true;	
 	                                                 
 	//                    __  __              __    
 	//    ____ ___  ___  / /_/ /_  ____  ____/ /____
@@ -151,15 +152,114 @@ class __{
 	 * Before: Hellow world!
 	 * After: Hellow...
 	 * @param  string $str --- string to cut
-	 * @param  int $maxLen --- count symbols
+	 * @param  int $max --- count symbols
 	 * @return string      --- cutted string
 	 */
-	public static function cutText($str, $maxLen)
+	public static function cutText($str, $max)
 	{
-		if (mb_strlen($str) > $maxLen)
+		$str = substr($str, 0, $max+1);
+		if (mb_strlen($str) > $max)
 		{
-			preg_match('/^.{0,'.$maxLen.'} .*?/ui', $str, $match);
-			return $match[0].'...';
+			$pieces = explode(' ', $str);
+			unset($pieces[count($pieces)-1]);
+			return implode(' ', $pieces).'...';
+		}
+		return $str;
+	}
+
+	/**
+	 * Get and Set cache
+	 * @param  string  $key  --- key cache
+	 * @param  mixed  $func  --- get value function if cache is empty
+	 * @param  integer $time --- how mutch time cache is live
+	 * @return mixed         --- value
+	 */
+	public static function getSetCache($key, $func, $time = 3600)
+	{
+		$val = self::getCache($key);
+		if($val === false)
+		{
+			$val = $func();
+			self::setCache($key, $val, $time);
+			return $val;
+		}
+		else
+		{
+			return $val;
+		}
+	}
+
+	/**
+	 * Set Cache
+	 * @param string  $key    
+	 * @param string  $val    
+	 * @param integer $time   
+	 * @param string  $prefix 
+	 */
+	public static function setCache($key, $val, $time = 3600)
+	{		
+		$val = is_array($val) ? serialize($val) : $val;
+		$val = base64_encode($val);
+		set_transient($key, $val, $time);
+	}
+
+	/**
+	 * Get Cache
+	 * @param  string $key    
+	 * @param  string $prefix 
+	 * @return mixed
+	 */
+	public static function getCache($key)
+	{	
+		$cached = false;	
+		if(self::CACHE_ON)
+		{
+			$cached = get_transient($key);
+			if($cached !== false)
+			{
+				$cached     = base64_decode($cached);
+				$cached_arr = unserialize($cached);
+
+				if(is_array($cached_arr))
+				{
+					$cached = $cached_arr;
+				}
+			} 
+		}
+		return false !== $cached ? $cached : false;
+	}
+
+	/**
+	 * Get all hashtags from string
+	 * @param  string $str --- some text with hashtags
+	 * @return array       --- hashtags
+	 */
+	public static function getAllHastags($str)
+	{
+		$result = array();
+		preg_match_all('/#[^\s]*/i', $str, $result);
+		return $result;
+	}
+
+	/**
+	 * Wrap hastag to link
+	 * @param  string $str --- some text with hashtags
+	 * @param  string $link_pattern --- link patter like: https://twitter.com/hashtag/%s?src=hash
+	 * @return string --- some text with wrapped hashtags
+	 */
+	public static function wrapHashtags($str, $link_pattern = '%s')
+	{
+		if(!strlen($link_pattern)) return $str;
+		$hashtags = self::getAllHastags($str);
+		if(isset($hashtags[0]) AND count($hashtags[0]))
+		{
+			foreach ($hashtags[0] as $tag) 
+			{
+				$tag_clean   = str_replace('#', '', $tag);
+				$tag_url     = sprintf($link_pattern, $tag_clean);
+				$tag_wrapped = sprintf('<a href="%s" target="_blank">%s</a>', $tag_url, $tag);
+				$str         = str_replace($tag, $tag_wrapped, $str);
+			}
 		}
 		return $str;
 	}

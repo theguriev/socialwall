@@ -191,6 +191,7 @@ class TwitterOAuth {
    * @return API results
    */
   function http($url, $method, $postfields = NULL) {
+    
     $this->http_info = array();
     $ci = curl_init();
     /* Curl settings */

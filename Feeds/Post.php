@@ -17,15 +17,21 @@ class Post extends Feed{
 		$args = array(
 			'posts_per_page'   => $count,
 			'offset'           => $offset,
+			'category'         => '',
 			'orderby'          => 'post_date',
 			'order'            => 'DESC',
+			'include'          => '',
+			'exclude'          => '',
+			'meta_key'         => '',
+			'meta_value'       => '',
 			'post_type'        => 'post',
+			'post_mime_type'   => '',
+			'post_parent'      => '',
 			'post_status'      => 'publish',
 			'suppress_filters' => true 
 		);
-		$args  = array_merge($args, $this->options);		
+		$args  = array_merge($args, $this->options);
 		$posts = get_posts($args);
-		
 		return $this->convert($posts);
 	}
 
@@ -38,13 +44,15 @@ class Post extends Feed{
 			{	
 				$user = get_user_by('id', $p->post_author); 				
 				array_push($messages, new Message(
-						$p->post_content,
+						strip_tags($p->post_content),
 						get_permalink($p->ID),
 						$p->post_date,
 						$user->data->user_login,
 						\__::getThumbnailURL($p->ID),
 						$this->getName(),
-						$this->getIcon()
+						$this->getIcon(),
+						Null,
+						''
 					));
 			}	
 		}
@@ -68,7 +76,7 @@ class Post extends Feed{
 	{
 		return array(
 			'post_type' => get_option('gc_pt_post_type'),
-			'include'   => get_option('gc_pt_include_categories'),
+			'category'  => get_option('gc_pt_include_categories'),
 			'icon'      => get_option('gc_pt_custom_icon')
 		);
 	}
