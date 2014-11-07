@@ -117,7 +117,13 @@ abstract class Control{
 	public function getTitleHTML()
 	{
 		if(!$this->meta_hidden['show_title']) return '';
-		$label = new Label($this->title);
+		$label = new Label(
+			$this->title.':',
+			array(
+				'container' => 'label',
+				'for'       => $this->getName()
+			)
+		);
 		return $label->getHTML();
 	}
 

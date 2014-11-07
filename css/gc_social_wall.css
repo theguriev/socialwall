@@ -1,18 +1,22 @@
-.bricks nav ul.bricks-buttons{
+#bricks{
+	position: relative;
+}
+
+#bricks nav ul.bricks-buttons{
 	margin: 0;
 	text-align: center;
 }
 
-.bricks nav{
+#bricks nav{
 	margin: 0 0 30px 0;
 }
 
-.bricks nav ul.bricks-buttons li{
+#bricks nav ul.bricks-buttons li{
 	display: inline-block;
 	margin: 0 0 0 5px;
 }
 
-.bricks nav ul.bricks-buttons li a{
+#bricks nav ul.bricks-buttons li a{
 	border-radius: 50%;
 	color: white;
 	background: black;
@@ -23,11 +27,11 @@
 	border: 2px solid transparent;
 }
 
-.bricks nav ul.bricks-buttons li a i{
+#bricks nav ul.bricks-buttons li a i{
 	line-height: 60px;
 }
 
-.bricks .bricks-content .brick{
+#bricks .bricks-content .brick{
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.22);
 	overflow: hidden;
@@ -36,9 +40,10 @@
 	width: 236px;
 	border-radius: 6px;
 	margin: 0 0 10px 0;
+	position: relative;
 }
 
-.bricks .bricks-content .brick .share-panel{
+#bricks .bricks-content .brick .share-panel{
 	left: 30px;
 	list-style: none outside none;
 	opacity: 1;
@@ -48,12 +53,12 @@
 	opacity: 0;
 }
 
-.bricks .bricks-content .brick .share-panel li{
+#bricks .bricks-content .brick .share-panel li{
 	margin: 0 5px;
 	display: inline-block;
 }
 
-.bricks .bricks-content .brick .share-panel li a{
+#bricks .bricks-content .brick .share-panel li a{
 	display: block;
 	height: 30px;
 	width: 30px;
@@ -64,13 +69,13 @@
 }
 
 
-.bricks .bricks-content .brick:hover .share-panel{
+#bricks .bricks-content .brick:hover .share-panel{
 	top: 15px;
 	opacity: 1;
 	z-index: 3;
 }
 
-.bricks .bricks-content .brick .brick-type{
+#bricks .bricks-content .brick .brick-type{
 	border-radius: 50%;
 	display: block;
 	height: 30px;
@@ -82,28 +87,28 @@
 	width: 30px;
 }
 
-.bricks .bricks-content .brick .brick-type i{
+#bricks .bricks-content .brick .brick-type i{
 	line-height: 30px;
 	color: white;
 }
 
-.bricks .bricks-content .brick header{
+#bricks .bricks-content .brick header{
 	float: left;
 	width: 100%;
 }
 
-.bricks .bricks-content .brick header img{
+#bricks .bricks-content .brick header img{
 	width: 100%;
 	border-radius: 0;
 	float: left;
 }
 
-.bricks .bricks-content .brick section{
+#bricks .bricks-content .brick section{
 	padding: 20px;
 	overflow: hidden;
 }
 
-.bricks .bricks-content .brick section a{
+#bricks .bricks-content .brick section a{
 	text-decoration: none;
 }
 
@@ -184,128 +189,128 @@
 }
 
 /*COLORS*/
-.bricks .bricks-content .brick.twitter .brick-type{
+#bricks .bricks-content .brick.twitter .brick-type{
 	background: #55acee;
 }
 
-.bricks nav ul.bricks-buttons li.twitter.filter a:hover,
-.bricks nav ul.bricks-buttons li.twitter a{
+#bricks nav ul.bricks-buttons li.twitter.filter a:hover,
+#bricks nav ul.bricks-buttons li.twitter a{
 	background: #55acee;
 	color: white;
 	border-color: transparent;
 }	
 
-.bricks nav ul.bricks-buttons li.twitter a:hover,
-.bricks nav ul.bricks-buttons li.twitter.filter a{	
+#bricks nav ul.bricks-buttons li.twitter a:hover,
+#bricks nav ul.bricks-buttons li.twitter.filter a{	
 	background: transparent;
 	color: #55acee;
 	border-color: #55acee;
 }
 
-.bricks .bricks-content .brick.facebook .brick-type{
+#bricks .bricks-content .brick.facebook .brick-type{
 	background: #3b5998;
 }
 
-.bricks nav ul.bricks-buttons li.facebook.filter a:hover,
-.bricks nav ul.bricks-buttons li.facebook a{
+#bricks nav ul.bricks-buttons li.facebook.filter a:hover,
+#bricks nav ul.bricks-buttons li.facebook a{
 	background: #3b5998;
 	color: white;
 	border-color: transparent;
 }
 
-.bricks nav ul.bricks-buttons li.facebook.filter a,
-.bricks nav ul.bricks-buttons li.facebook a:hover{
+#bricks nav ul.bricks-buttons li.facebook.filter a,
+#bricks nav ul.bricks-buttons li.facebook a:hover{
 	color: #3b5998;
 	border-color: #3b5998;
 	background: transparent;
 }
 
-.bricks .bricks-content .brick.post .brick-type{
+#bricks .bricks-content .brick.post .brick-type{
 	background: #222222;
 }
 
-.bricks nav ul.bricks-buttons li.post.filter a:hover,
-.bricks nav ul.bricks-buttons li.post a{
+#bricks nav ul.bricks-buttons li.post.filter a:hover,
+#bricks nav ul.bricks-buttons li.post a{
 	background: #222222;
 	color: white;
 	border-color: transparent;
 }
 
-.bricks nav ul.bricks-buttons li.post.filter a,
-.bricks nav ul.bricks-buttons li.post a:hover{
+#bricks nav ul.bricks-buttons li.post.filter a,
+#bricks nav ul.bricks-buttons li.post a:hover{
 	color: #222222;
 	border-color: #222222;
 	background: transparent;	
 }
 
-.bricks .bricks-content .brick.youtube .brick-type{
+#bricks .bricks-content .brick.youtube .brick-type{
 	background: #b31217;
 }
 
-.bricks nav ul.bricks-buttons li.youtube.filter a:hover,
-.bricks nav ul.bricks-buttons li.youtube a{
+#bricks nav ul.bricks-buttons li.youtube.filter a:hover,
+#bricks nav ul.bricks-buttons li.youtube a{
 	background: #b31217;
 	color: white;
 	border-color: transparent;
 }
 
-.bricks nav ul.bricks-buttons li.youtube.filter a,
-.bricks nav ul.bricks-buttons li.youtube a:hover{
+#bricks nav ul.bricks-buttons li.youtube.filter a,
+#bricks nav ul.bricks-buttons li.youtube a:hover{
 	color: #b31217;
 	border-color: #b31217;
 	background: transparent;	
 }
 
-.bricks .bricks-content .brick.vimeo .brick-type{
+#bricks .bricks-content .brick.vimeo .brick-type{
 	background: #1ab7ea;
 }
 
-.bricks nav ul.bricks-buttons li.vimeo.filter a:hover,
-.bricks nav ul.bricks-buttons li.vimeo a{
+#bricks nav ul.bricks-buttons li.vimeo.filter a:hover,
+#bricks nav ul.bricks-buttons li.vimeo a{
 	background: #1ab7ea;
 	color: white;
 	border-color: transparent;
 }
 
-.bricks nav ul.bricks-buttons li.vimeo.filter a,
-.bricks nav ul.bricks-buttons li.vimeo a:hover{
+#bricks nav ul.bricks-buttons li.vimeo.filter a,
+#bricks nav ul.bricks-buttons li.vimeo a:hover{
 	color: #1ab7ea;
 	border-color: #1ab7ea;
 	background: transparent;	
 }
 
-.bricks .bricks-content .brick.instagram .brick-type{
+#bricks .bricks-content .brick.instagram .brick-type{
 	background: #517fa4;
 }
 
-.bricks nav ul.bricks-buttons li.instagram.filter a:hover,
-.bricks nav ul.bricks-buttons li.instagram a{
+#bricks nav ul.bricks-buttons li.instagram.filter a:hover,
+#bricks nav ul.bricks-buttons li.instagram a{
 	background: #517fa4;
 	color: white;
 	border-color: transparent;
 }
 
-.bricks nav ul.bricks-buttons li.instagram.filter a,
-.bricks nav ul.bricks-buttons li.instagram a:hover{
+#bricks nav ul.bricks-buttons li.instagram.filter a,
+#bricks nav ul.bricks-buttons li.instagram a:hover{
 	color: #517fa4;
 	border-color: #517fa4;
 	background: transparent;	
 }
 
 
-.bricks .bricks-content .brick.vk .brick-type{
+#bricks .bricks-content .brick.vk .brick-type{
 	background: #45668e;
 }
 
-.bricks nav ul.bricks-buttons li.vk.filter a:hover,
-.bricks nav ul.bricks-buttons li.vk a{
+#bricks nav ul.bricks-buttons li.vk.filter a:hover,
+#bricks nav ul.bricks-buttons li.vk a{
 	background: #45668e;
 	color: white;
 	border-color: transparent;
 }
 
-.bricks nav ul.bricks-buttons li.vk.filter a,
-.bricks nav ul.bricks-buttons li.vk a:hover{
+#bricks nav ul.bricks-buttons li.vk.filter a,
+#bricks nav ul.bricks-buttons li.vk a:hover{
 	color: #45668e;
 	border-color: #45668e;
 	background: transparent;	
@@ -313,45 +318,45 @@
 
 /* SHARE PANEL COLORS */
 
-.bricks .bricks-content .brick .share-panel li.facebook a{
+#bricks .bricks-content .brick .share-panel li.facebook a{
 	background: #3b5998;
 	color: white;
 }
 
-.bricks .bricks-content .brick .share-panel li.facebook a:hover{
+#bricks .bricks-content .brick .share-panel li.facebook a:hover{
 	border-color: #3b5998;
 	background: transparent;
 	color: #3b5998;
 }
 
-.bricks .bricks-content .brick .share-panel li.twitter a{
+#bricks .bricks-content .brick .share-panel li.twitter a{
 	background: #55acee;
 	color: white;
 }
 
-.bricks .bricks-content .brick .share-panel li.twitter a:hover{
+#bricks .bricks-content .brick .share-panel li.twitter a:hover{
 	border-color: #55acee;
 	background: transparent;
 	color: #55acee;
 }
 
-.bricks .bricks-content .brick .share-panel li.google-plus a{
+#bricks .bricks-content .brick .share-panel li.google-plus a{
 	background: #dd4b39;
 	color: white;
 }
 
-.bricks .bricks-content .brick .share-panel li.google-plus a:hover{
+#bricks .bricks-content .brick .share-panel li.google-plus a:hover{
 	border-color: #dd4b39;
 	background: transparent;
 	color: #dd4b39;	
 }
 
-.bricks .bricks-content .brick .share-panel li.linkedin a{
+#bricks .bricks-content .brick .share-panel li.linkedin a{
 	background: #007bb6;
 	color: white;
 }
 
-.bricks .bricks-content .brick .share-panel li.linkedin a:hover{
+#bricks .bricks-content .brick .share-panel li.linkedin a:hover{
 	border-color: #007bb6;
 	background: transparent;
 	color: #007bb6;	

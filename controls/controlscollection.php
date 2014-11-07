@@ -94,8 +94,8 @@ class ControlsCollection{
 		{
 			foreach ($this->controls as $ctrl) 
 			{
-				$value = isset($this->values[$ctrl->getName()]) ? $this->values[$ctrl->getName()] : null;
-				$str  .= $ctrl->getHTML($value);
+				$value = isset($this->values[$ctrl->getName()]) ? $this->values[$ctrl->getName()] : $ctrl->getDefaultValue();
+				$str  .= '<p>'.$ctrl->getHTML($value).'</p>';
 			}
 		}
 		return $str;

@@ -1,21 +1,38 @@
-i.mce-i-gc_cocial_wall {
-	background: url(../images/wall.png) no-repeat;
+.gc-social-wall-admin #widgets-right .sidebars-column-1, #widgets-right .sidebars-column-2 {
+	float: left;
+	width: 90%;
+	max-width: none;
 }
 
-#adminmenu #toplevel_page_gc_social_wall .wp-menu-image:before {
-	content: "";  
-	background: url("../images/wall999.png") no-repeat scroll 0px 6px rgba(0, 0, 0, 0);
+.gc-social-wall-admin .control-checkbox-wrap{
+	float: left;
 }
 
-#adminmenu #toplevel_page_gc_social_wall:hover .wp-menu-image:before {
-	content: "";  
-	background: url("../images/wall2ea2cc.png") no-repeat scroll 0px 6px rgba(0, 0, 0, 0);
+.gc-social-wall-admin .shortcode{
+	background: none repeat scroll 0 0 #fff;
+	border: 1px solid #e5e5e5;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	box-sizing: border-box;
+	display: block;
+	float: left;
+	margin: 20px 0 0;
+	padding: 15px;
+	width: 94%;
+	position: relative;
 }
 
-#adminmenu #toplevel_page_gc_social_wall.current .wp-menu-image:before,
-#adminmenu #toplevel_page_gc_social_wall.current:hover .wp-menu-image:before{
-	content: "";  
-	background: url("../images/wallfff.png") no-repeat scroll 0px 6px rgba(0, 0, 0, 0);
+.gc-social-wall-admin .shortcode code{
+	padding: 3px 5px 2px;
+	margin: 0px 1px;
+	background: none repeat scroll 0% 0% rgba(0, 0, 0, 0.07);
+	font-size: 13px;
+	float: left;
+	word-wrap: break-word;
+	width: 99%;
 }
 
-#adminmenu .current div.wp-menu-image:before, #adminmenu .wp-has-current-submenu div.wp-menu-image:before, #adminmenu a.current:hover div.wp-menu-image:before, #adminmenu a.wp-has-current-submenu:hover div.wp-menu-image:before, #adminmenu li.wp-has-current-submenu:hover div.wp-menu-image:before
+.gc-social-wall-admin .shortcode .select-all{
+	position: absolute;
+	right: 15px;
+	top: 30px;
+}
